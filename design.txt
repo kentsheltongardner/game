@@ -1,0 +1,74 @@
+If the game is to be display on a 1920x1080 screen, resolutions for cards might be
+
+
+1080
+
+Subfloor layer (channels and grooves)
+
+
+Floor layer (tap to toggle on and off)
+    Arbitrary number of groups defined for a given button, defaults to 2
+
+Card layer (flip and fold)
+    Material
+    Requirement
+    Inklings
+    Border
+
+Ink layer (move up, down, left, and right, tap to select group)
+    Creatures
+        Behaviors
+
+Block layer (slide)
+    Magnetism
+    Relative positions of elements
+    Meta? Moving a black tile over a card or button means it need not be satisfied
+
+Glass layer (non-interactive)
+    Overlay
+
+Gantry layer ()
+
+
+Inter layer requirements?
+    
+
+Lighting/visibility layer?
+
+
+Memory layer?
+
+Dice        - probability
+Sliders in grooves
+Dials or rotating discs
+    Left and right click for clockwise/counterclockwise
+    Some controllable, some not
+Magnets
+Flip panels
+Glass overlays, colored overlays that reveal different images
+Threads and spools
+Weights and scales
+Stamps and ink
+Pen and ink, brush and paint
+Pegs
+Light sources and walls
+Bells to strike
+Rule based movers
+Etching or scratching
+Mathematical or geometrical puzzles
+Stackable objects
+Beams, glass, mirrors
+Pipes and tubes
+Knots
+Sliding beads on rods or wires
+Interior puzzles
+Functions and self referentiality
+Cutting and pasting/taping
+Gears and cogs, gantries
+Springs
+Timers
+Word puzzles
+Environment and inference
+Puzzle pieces
+Tessellations
+
