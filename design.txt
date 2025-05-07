@@ -1,31 +1,72 @@
 If the game is to be display on a 1920x1080 screen, resolutions for cards might be
 
 
-1080
 
-Subfloor layer (channels and grooves)
-
-
-Floor layer (tap to toggle on and off)
+$ Button layer (tap to toggle on and off)
     Arbitrary number of groups defined for a given button, defaults to 2
+    Visibility determines whether a requirement must be satisfied
+        Allows block and card layers to be used to satisfy requirements
+    Requirements
 
-Card layer (flip and fold)
+
+$ Card layer (flip and fold)
+    Visibility does not determine whether a requirement must be satisfied
     Material
     Requirement
     Inklings
     Border
+    Requirements
+        Visible
+        Hidden
+        Paired
+        Stacked?
+        Pointing?
 
-Ink layer (move up, down, left, and right, tap to select group)
-    Creatures
+$ Ink layer (move up, down, left, and right, tap to select group)
+    Visibility affects whether an object is controlled
+    Humans, gods, and fantastical creatures
         Behaviors
 
-Block layer (slide)
-    Magnetism
-    Relative positions of elements
-    Meta? Moving a black tile over a card or button means it need not be satisfied
+$ Block layer
+    Simple (slide)
+        Can push other blocks
+    Magic (click)
+        Cannot push other blocks
+        Execute the selected action immediately, at the point clicked
+        Actions
+            Translate
+                North   x n
+                South   x n
+                East    x n
+                West    x n
+            Rotate
+                Clockwise           x (1 or 2)
+                Counterclockwise    x (1 or 2)
+            Flip
+                Horizontal
+                Vertical
+                Positive diagonal
+                Negative diagonal
+    Requirements?
+        Relative positions
+
+
+
 
 Glass layer (non-interactive)
     Overlay
+    Changes meaning of symbols beneath?
+
+
+Subfloor layer (channels and grooves)
+    Left click pulls
+    Right click pushes
+    Problems
+        Not independent of buttons
+
+Beads layer (tap to pull)
+
+
 
 Gantry layer ()
 
