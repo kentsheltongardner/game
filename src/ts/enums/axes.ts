@@ -4,6 +4,7 @@ export default class Axes {
     static readonly Vertical            = 2
     static readonly PositiveDiagonal    = 3
     static readonly NegativeDiagonal    = 4
+    static readonly Orthogonal          = 5
 
     static readonly Names       = [
         'None', 
@@ -11,5 +12,6 @@ export default class Axes {
         'Vertical', 
         'Positive diagonal', 
         'Negative diagonal', 
+        'Orthogonal', 
     ]
 }

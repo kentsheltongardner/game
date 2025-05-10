@@ -15,7 +15,7 @@ export default class Base {
     shape:          number
     spin:           number
     connections:    number
-    state:          number
+    power:          number
     fixed:          boolean 
     visible:        boolean
 
@@ -29,10 +29,9 @@ export default class Base {
         shape:          number  = 0,
         spin:           number  = Spins.None,
         connections:    number  = 0,
-        state:          number  = 0,
+        power:          number  = 0,
         fixed:          boolean = false,
         visible:        boolean = true,
-
     ) {
         this.type           = type
         this.rule           = rule
@@ -43,7 +42,7 @@ export default class Base {
         this.shape          = shape
         this.spin           = spin
         this.connections    = connections
-        this.state          = state
+        this.power          = power
         this.fixed          = fixed
         this.visible        = visible
     }

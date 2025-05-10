@@ -1,3 +1,5 @@
+import Images from '../images.js'
+
 export default class BaseRules {
     static readonly None        = 0
     static readonly Vacuous     = 1
@@ -28,37 +30,72 @@ export default class BaseRules {
     static readonly Orthogonal  = 26
     static readonly Rules       = 27
     static readonly Mimic       = 28
+    static readonly Monochrome  = 29
 
-    static readonly Names       = [
-        'None', 
-        'Vacuous', 
-        'On', 
-        'Off', 
-        'Same', 
-        'Grouped', 
-        'Separated', 
-        'Length', 
-        'Area', 
-        'Relative', 
-        'Congruent', 
-        'Incongruent', 
-        'Symmetric', 
-        'Adjacent', 
-        'Path', 
-        'Loop', 
-        'Order', 
-        'Follow', 
-        'Equidistant', 
-        'Walk', 
-        'Neighbors', 
-        'Contain', 
-        'Exclude', 
-        'Hide', 
-        'Groups', 
-        'States', 
-        'Orthogonal', 
-        'Rules', 
-        'Mimic', 
+    static readonly Names = [
+        'None',         // None       
+        'Vacuous',      // Vacuous    
+        'On',           // On         
+        'Off',          // Off        
+        'Same',         // Same       
+        'Grouped',      // Grouped    
+        'Separated',    // Separated  
+        'Length',       // Length     
+        'Area',         // Area       
+        'Relative',     // Relative   
+        'Congruent',    // Congruent  
+        'Incongruent',  // Incongruent
+        'Symmetric',    // Symmetric  
+        'Adjacent',     // Adjacent   
+        'Path',         // Path       
+        'Loop',         // Loop       
+        'Order',        // Order      
+        'Follow',       // Follow     
+        'Equidistant',  // Equidistant
+        'Walk',         // Walk       
+        'Neighbors',    // Neighbors  
+        'Contain',      // Contain    
+        'Exclude',      // Exclude    
+        'Hide',         // Hide       
+        'Groups',       // Groups     
+        'States',       // States     
+        'Orthogonal',   // Orthogonal 
+        'Rules',        // Rules      
+        'Mimic',        // Mimic     
+        'Monochrome',   // Monochrome     
+    ]
+
+    static readonly Offsets = [
+        0, //'None', 
+        Images.OffsetIconLeaf,          //'Vacuous', 
+        Images.OffsetIconSun,           //'On', 
+        Images.OffsetIconMoon,          //'Off', 
+        Images.OffsetIconWolf,          //'Same', 
+        Images.OffsetIconFlower,        //'Grouped', 
+        Images.OffsetIconPetals,        //'Separated', 
+        Images.OffsetIconBones,         //'Length', 
+        Images.OffsetIconPebbles,       //'Area', 
+        Images.OffsetIconFish,          //'Relative', 
+        Images.OffsetIconHoneycomb,     //'Congruent', 
+        Images.OffsetIconSnowflake,     //'Incongruent', 
+        Images.OffsetIconClam,          //'Symmetric', 
+        Images.OffsetIconNests,         //'Adjacent', 
+        Images.OffsetIconSnake,         //'Path', 
+        Images.OffsetIconOuroboros,     //'Loop', 
+        Images.OffsetIconTrees,         //'Order', 
+        Images.OffsetIconAnt,           //'Follow', 
+        Images.OffsetIconOctopus,       //'Equidistant', 
+        Images.OffsetIconLizard,        //'Walk', 
+        Images.OffsetIconMushrooms,     //'Neighbors', 
+        Images.OffsetIconCloverSmall,   //'Contain', 
+        Images.OffsetIconSkullSmall,    //'Exclude', 
+        Images.OffsetIconOwl,           //'Hide', 
+        Images.OffsetIconLilyPads,      //'Groups', 
+        Images.OffsetIconClouds,        //'States', 
+        Images.OffsetIconStars,         //'Orthogonal', 
+        Images.OffsetIconApples,        //'Rules', 
+        Images.OffsetIconChameleon,     //'Mimic', 
+        Images.OffsetIconHummingbird,   //'Monochrome', 
     ]
 }
 

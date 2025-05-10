@@ -13,49 +13,50 @@ export default class Images {
     public static readonly OffsetIconPetals             = 5     * Images.CellSizePixels
     public static readonly OffsetIconSpider             = 6     * Images.CellSizePixels
     public static readonly OffsetIconWeb                = 7     * Images.CellSizePixels
-    public static readonly OffsetIconPebble             = 8     * Images.CellSizePixels
-    public static readonly OffsetIconBone               = 15    * Images.CellSizePixels
-    public static readonly OffsetIconFish               = 20    * Images.CellSizePixels
-    public static readonly OffsetIconNest               = 25    * Images.CellSizePixels
-    public static readonly OffsetIconHoneycomb          = 30    * Images.CellSizePixels
-    public static readonly OffsetIconSnowflake          = 31    * Images.CellSizePixels
-    public static readonly OffsetIconClam               = 32    * Images.CellSizePixels
-    public static readonly OffsetIconStarfish           = 34    * Images.CellSizePixels
-    public static readonly OffsetIconHummingbird        = 35    * Images.CellSizePixels
-    public static readonly OffsetIconSnake              = 36    * Images.CellSizePixels
-    public static readonly OffsetIconOuroboros          = 37    * Images.CellSizePixels
-    public static readonly OffsetIconAnt                = 38    * Images.CellSizePixels
-    public static readonly OffsetIconButterflySmall     = 39    * Images.CellSizePixels
-    public static readonly OffsetIconCloverSmall        = 40    * Images.CellSizePixels
-    public static readonly OffsetIconSkullSmall         = 41    * Images.CellSizePixels
-    public static readonly OffsetIconTree               = 42    * Images.CellSizePixels
-    public static readonly OffsetIconLizard             = 48    * Images.CellSizePixels
-    public static readonly OffsetIconOwl                = 49    * Images.CellSizePixels
-    public static readonly OffsetIconStar               = 50    * Images.CellSizePixels
-    public static readonly OffsetIconChameleon          = 55    * Images.CellSizePixels
-    public static readonly OffsetIconOctopus            = 56    * Images.CellSizePixels
-    public static readonly OffsetIconCloud              = 57    * Images.CellSizePixels
-    public static readonly OffsetIconMushroom           = 62    * Images.CellSizePixels
-    public static readonly OffsetIconLilyPad            = 67    * Images.CellSizePixels
-    public static readonly OffsetIconClover             = 72    * Images.CellSizePixels
-    public static readonly OffsetIconCrossBones         = 73    * Images.CellSizePixels
-    public static readonly OffsetIconPawPrint           = 74    * Images.CellSizePixels
-    public static readonly OffsetIconButterfly          = 76    * Images.CellSizePixels
-    public static readonly OffsetIconMoth               = 77    * Images.CellSizePixels
-    public static readonly OffsetIconLadybug            = 78    * Images.CellSizePixels
-    public static readonly OffsetIconBee                = 79    * Images.CellSizePixels
-    public static readonly OffsetIconQueenBee           = 80    * Images.CellSizePixels
-    public static readonly OffsetIconBeehive            = 81    * Images.CellSizePixels
-    public static readonly OffsetIconDragonfly          = 82    * Images.CellSizePixels
-    public static readonly OffsetIconPlaque             = 84    * Images.CellSizePixels
-    public static readonly OffsetIconPlaqueTranslate    = 85    * Images.CellSizePixels
-    public static readonly OffsetIconPlaqueRotate       = 93    * Images.CellSizePixels
-    public static readonly OffsetIconPlaqueReflect      = 95    * Images.CellSizePixels
+    public static readonly OffsetIconPebbles            = 8     * Images.CellSizePixels
+    public static readonly OffsetIconBones              = 15    * Images.CellSizePixels
+    public static readonly OffsetIconFish               = 25    * Images.CellSizePixels
+    public static readonly OffsetIconNests              = 30    * Images.CellSizePixels
+    public static readonly OffsetIconHoneycomb          = 35    * Images.CellSizePixels
+    public static readonly OffsetIconSnowflake          = 36    * Images.CellSizePixels
+    public static readonly OffsetIconClam               = 37    * Images.CellSizePixels
+    public static readonly OffsetIconStarfish           = 41    * Images.CellSizePixels
+    public static readonly OffsetIconHummingbird        = 42    * Images.CellSizePixels
+    public static readonly OffsetIconSnake              = 43    * Images.CellSizePixels
+    public static readonly OffsetIconOuroboros          = 44    * Images.CellSizePixels
+    public static readonly OffsetIconAnt                = 45    * Images.CellSizePixels
+    public static readonly OffsetIconButterflySmall     = 46    * Images.CellSizePixels
+    public static readonly OffsetIconCloverSmall        = 47    * Images.CellSizePixels
+    public static readonly OffsetIconSkullSmall         = 48    * Images.CellSizePixels
+    public static readonly OffsetIconTrees              = 49    * Images.CellSizePixels
+    public static readonly OffsetIconLizard             = 55    * Images.CellSizePixels
+    public static readonly OffsetIconOwl                = 56    * Images.CellSizePixels
+    public static readonly OffsetIconStars              = 57    * Images.CellSizePixels
+    public static readonly OffsetIconChameleon          = 62    * Images.CellSizePixels
+    public static readonly OffsetIconOctopus            = 63    * Images.CellSizePixels
+    public static readonly OffsetIconClouds             = 64    * Images.CellSizePixels
+    public static readonly OffsetIconMushrooms          = 69    * Images.CellSizePixels
+    public static readonly OffsetIconLilyPads           = 74    * Images.CellSizePixels
+    public static readonly OffsetIconClover             = 79    * Images.CellSizePixels
+    public static readonly OffsetIconCrossBones         = 80    * Images.CellSizePixels
+    public static readonly OffsetIconPawPrint           = 81    * Images.CellSizePixels
+    public static readonly OffsetIconApples             = 89    * Images.CellSizePixels
+    public static readonly OffsetIconButterfly          = 94    * Images.CellSizePixels
+    public static readonly OffsetIconMoth               = 95    * Images.CellSizePixels
+    public static readonly OffsetIconLadybug            = 96    * Images.CellSizePixels
+    public static readonly OffsetIconBee                = 97    * Images.CellSizePixels
+    public static readonly OffsetIconQueenBee           = 98    * Images.CellSizePixels
+    public static readonly OffsetIconBeehive            = 99    * Images.CellSizePixels
+    public static readonly OffsetIconDragonfly          = 100   * Images.CellSizePixels
+    public static readonly OffsetIconPlaque             = 108   * Images.CellSizePixels
+    public static readonly OffsetIconPlaqueTranslate    = 109   * Images.CellSizePixels
+    public static readonly OffsetIconPlaqueReflect      = 141   * Images.CellSizePixels
+    public static readonly OffsetIconPlaqueRotate       = 145   * Images.CellSizePixels
 
-    public static readonly OffsetTemplateBase           = 0     * Images.CellSizePixels
-    public static readonly OffsetTemplateBinary         = 1     * Images.CellSizePixels
-    public static readonly OffsetTemplateTernary        = 2     * Images.CellSizePixels
-    public static readonly OffsetTemplateQuaternary     = 3     * Images.CellSizePixels
+    public static readonly OffsetTemplateBaseBacking    = 0     * Images.CellSizePixels
+    public static readonly OffsetTemplateBaseGold       = 1     * Images.CellSizePixels
+    public static readonly OffsetTemplateBaseSilver     = 2     * Images.CellSizePixels
+    public static readonly OffsetTemplateBaseBronze     = 3     * Images.CellSizePixels
     public static readonly OffsetTemplateScrews         = 4     * Images.CellSizePixels
     public static readonly OffsetTemplateCard           = 5     * Images.CellSizePixels
     public static readonly OffsetTemplateGrass          = 6     * Images.CellSizePixels
@@ -66,12 +67,13 @@ export default class Images {
     public static readonly OffsetTemplateFront          = 11    * Images.CellSizePixels
     public static readonly OffsetTemplateBack           = 12    * Images.CellSizePixels
     public static readonly OffsetTemplateTile           = 13    * Images.CellSizePixels
+    public static readonly OffsetTemplateBasePlain      = 14    * Images.CellSizePixels
 
-    public static readonly Icons                        = <HTMLImageElement>document.getElementById('icons')
+    public static readonly Icons        = <HTMLImageElement>document.getElementById('icons')
+    public static OffsetMap             = new Array(256).fill(-1)
     public static Tilesets: HTMLImageElement
 
     private static readonly Templates   = <HTMLImageElement>document.getElementById('templates')
-    private static OffsetMap            = new Array(256).fill(-1)
     private static SoutheastMap         = new Array(256).fill(-1)
     private static SouthwestMap         = new Array(256).fill(-1)
     private static NorthwestMap         = new Array(256).fill(-1)
@@ -118,11 +120,11 @@ export default class Images {
             const neIndex: number = Images.templateIndex(e, n, ne)
             if (neIndex === -1) continue
 
-            Images.OffsetMap[i]     = index
-            Images.SoutheastMap[i]  = seIndex
-            Images.SouthwestMap[i]  = swIndex
-            Images.NorthwestMap[i]  = nwIndex
-            Images.NortheastMap[i]  = neIndex
+            Images.OffsetMap[i]     = index * Images.CellSizePixels
+            Images.SoutheastMap[i]  = seIndex * Images.CellSizePixels
+            Images.SouthwestMap[i]  = swIndex * Images.CellSizePixels
+            Images.NorthwestMap[i]  = nwIndex * Images.CellSizePixels
+            Images.NortheastMap[i]  = neIndex * Images.CellSizePixels
 
             index++
         }
@@ -154,15 +156,15 @@ export default class Images {
                 if (offset === -1) continue
 
                 const y         = j * size
-                const srcXSE    = Images.SoutheastMap[i] * size + lower
-                const srcXSW    = Images.SouthwestMap[i] * size
-                const srcXNW    = Images.NorthwestMap[i] * size
-                const srcXNE    = Images.NortheastMap[i] * size + lower
+                const srcXSE    = Images.SoutheastMap[i] + lower
+                const srcXSW    = Images.SouthwestMap[i]
+                const srcXNW    = Images.NorthwestMap[i]
+                const srcXNE    = Images.NortheastMap[i] + lower
 
-                context.drawImage(template, srcXSE, y + lower,  upper, upper, offset * size + lower,    y + lower,  upper, upper)
-                context.drawImage(template, srcXSW, y + lower,  lower, upper, offset * size,            y + lower,  lower, upper)
-                context.drawImage(template, srcXNW, y,          lower, lower, offset * size,            y,          lower, lower)
-                context.drawImage(template, srcXNE, y,          upper, lower, offset * size + lower,    y,          upper, lower)
+                context.drawImage(template, srcXSE, y + lower,  upper, upper, offset + lower,    y + lower,  upper, upper)
+                context.drawImage(template, srcXSW, y + lower,  lower, upper, offset,            y + lower,  lower, upper)
+                context.drawImage(template, srcXNW, y,          lower, lower, offset,            y,          lower, lower)
+                context.drawImage(template, srcXNE, y,          upper, lower, offset + lower,    y,          upper, lower)
             }
         }
 

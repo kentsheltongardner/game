@@ -7,42 +7,63 @@ import Colors from './enums/colors.js';
 import Directions from './enums/directions.js';
 import Faces from './enums/faces.js';
 import Spins from './enums/spins.js';
-import MouseData from './mouse_data.js';
 import Watermarks from './enums/watermarks.js';
 import Puzzle from './puzzle.js';
 import Materials from './enums/material.js';
-import Point from './geometry/point.js';
-const ConnectionToggleRadius = 0.25;
+import Images from './images.js';
+import Layers from './enums/layers.js';
+import Tools from './enums/tools.js';
+import Base from './objects/base.js';
+const ConnectionToggleRadius = 0.125;
+const ConnectionToggleRadiusSquared = ConnectionToggleRadius * ConnectionToggleRadius;
+const Tau = Math.PI * 2;
 export default class Editor {
     camera;
     canvas;
     context;
-    controlSelection = new Point(0, 0);
-    mouseData = new MouseData();
-    puzzle = new Puzzle();
+    controlGridX = 0;
+    controlGridY = 0;
+    mouseX = -1;
+    mouseY = -1;
+    mousePressed = false;
+    mouseDownGridX = -1;
+    mouseDownGridY = -1;
+    mouseGridX = -1;
+    mouseGridY = -1;
     spacePressed = false;
+    puzzle = new Puzzle();
     constructor() {
-        const cameraX = this.puzzle.width / 2;
-        const cameraY = this.puzzle.height / 2;
+        const cameraX = this.puzzle.width() / 2;
+        const cameraY = this.puzzle.height() / 2;
         this.camera = new Camera(cameraX, cameraY);
         this.canvas = document.getElementById('editor-canvas');
         this.context = this.canvas.getContext('2d');
-        console.log(this.puzzle);
         this.populateSelects();
         this.addEventListeners();
         this.resize();
-        this.camera.autoZoom(this.puzzle.width, this.puzzle.height, this.canvas.width, this.canvas.height);
+        this.zoom();
         this.loop();
     }
+    //  #####   #######  #        #######   #####   #######   #####   
+    // #     #  #        #        #        #     #     #     #     #  
+    // #        #        #        #        #           #     #        
+    //  #####   ####     #        ####     #           #      #####   
+    //       #  #        #        #        #           #           #  
+    // #     #  #        #        #        #     #     #     #     #  
+    //  #####   #######  #######  #######   #####      #      #####   
     populateSelects() {
+        this.populateCustomSelect('base-tool-select', Tools.BaseTools, Tools.Names);
+        this.populateCustomSelect('card-tool-select', Tools.CardTools, Tools.Names);
+        this.populateCustomSelect('tile-tool-select', Tools.TileTools, Tools.Names);
+        this.populateSelect('layer-select', Layers.Names);
         this.populateSelect('base-type-select', BaseTypes.Names);
         this.populateSelect('base-rule-select', BaseRules.Names);
         this.populateSelect('base-color-select', Colors.Names);
         this.populateSelect('base-spin-select', Spins.Names);
         this.populateSelect('base-axis-select', Axes.Names);
         this.populateSelect('base-direction-select', Directions.Names);
-        this.populateNumericSelect('base-count-select', 7);
-        this.populateNumericSelect('base-state-select', 3);
+        this.populateIntegerSelect('base-count-select', 7);
+        this.populateIntegerSelect('base-power-select', 3);
         this.populateSelect('top-card-face-select', Faces.Names);
         this.populateSelect('top-card-watermark-select', Watermarks.Names);
         this.populateSelect('top-card-rule-select', CardRules.Names);
@@ -61,10 +82,10 @@ export default class Editor {
         this.populateSelect('tile-material-select', Materials.Names);
         this.populateSelect('tile-direction-select', Directions.Names);
         this.populateSelect('tile-spin-select', Spins.Names);
-        this.populateNumericSelect('tile-count-select', 4);
+        this.populateIntegerSelect('tile-count-select', 4);
     }
     populateSelect(selectId, names) {
-        const select = document.getElementById(selectId);
+        const select = this.getSelect(selectId);
         for (let i = 0; i < names.length; i++) {
             const option = document.createElement('option');
             option.value = i + '';
@@ -72,8 +93,17 @@ export default class Editor {
             select.appendChild(option);
         }
     }
-    populateNumericSelect(selectId, count) {
-        const select = document.getElementById(selectId);
+    populateCustomSelect(selectId, indices, names) {
+        const select = this.getSelect(selectId);
+        for (const index of indices) {
+            const option = document.createElement('option');
+            option.value = index + '';
+            option.innerText = names[index];
+            select.appendChild(option);
+        }
+    }
+    populateIntegerSelect(selectId, count) {
+        const select = this.getSelect(selectId);
         for (let i = 0; i <= count; i++) {
             const option = document.createElement('option');
             const value = i + '';
@@ -82,145 +112,354 @@ export default class Editor {
             select.appendChild(option);
         }
     }
-    addEventListeners() {
-        this.canvas.addEventListener('mousedown', e => {
-            switch (e.button) {
-                case 0:
-                    this.primaryMouseDown();
-                    break;
-                case 2:
-                    this.secondaryMouseDown();
-                    break;
-            }
-        });
-        this.canvas.addEventListener('mousemove', e => {
-            this.mouseMove(e);
-        });
-        this.canvas.addEventListener('mouseup', e => {
-            switch (e.button) {
-                case 0:
-                    this.primaryMouseUp();
-                    break;
-                case 2:
-                    this.secondaryMouseUp();
-                    break;
-            }
-        });
-        this.canvas.addEventListener('mouseleave', () => {
-            this.mouseLeave();
-        });
-        this.canvas.addEventListener('wheel', e => {
-            this.mouseWheel(e);
-        });
-        document.getElementById('grow-east').addEventListener('mousedown', () => {
-            this.puzzle.growEast();
-        });
-        document.getElementById('grow-south').addEventListener('mousedown', () => {
-            this.puzzle.growSouth();
-        });
-        document.getElementById('grow-west').addEventListener('mousedown', () => {
-            this.puzzle.growWest();
-            this.camera.shiftX(1);
-        });
-        document.getElementById('grow-north').addEventListener('mousedown', () => {
-            this.puzzle.growNorth();
-            this.camera.shiftY(1);
-        });
-        document.getElementById('shrink-east').addEventListener('mousedown', () => {
-            this.puzzle.shrinkEast();
-        });
-        document.getElementById('shrink-south').addEventListener('mousedown', () => {
-            this.puzzle.shrinkSouth();
-        });
-        document.getElementById('shrink-west').addEventListener('mousedown', () => {
-            this.puzzle.shrinkWest();
-            this.camera.shiftX(-1);
-        });
-        document.getElementById('shrink-north').addEventListener('mousedown', () => {
-            this.puzzle.shrinkNorth();
-            this.camera.shiftY(-1);
-        });
-        window.addEventListener('contextmenu', e => {
-            e.stopPropagation();
-            e.preventDefault();
-        });
-        document.getElementById('zoom-button').addEventListener('mousedown', () => {
-            this.camera.autoZoom(this.puzzle.width, this.puzzle.height, this.canvas.width, this.canvas.height);
-        });
-        window.addEventListener('resize', () => { this.resize(); });
-        window.addEventListener('keydown', e => {
-            switch (e.code) {
-                case 'Space': {
-                    this.spacePressed = true;
-                    break;
-                }
-            }
-        });
-        window.addEventListener('keyup', e => {
-            switch (e.code) {
-                case 'Space': {
-                    this.spacePressed = false;
-                    break;
-                }
-            }
-        });
-        // const layerSelect = <HTMLSelectElement>document.getElementById('layer-select')!
-        // layerSelect.addEventListener('change', () => {
-        //     const toolsSections = document.getElementsByClassName('tools')
-        //     for (const toolsSection of toolsSections) {
-        //         toolsSection.classList.add('hidden')
-        //     }
-        //     switch (layerSelect.value) {
-        //         case 'base':
-        //             document.getElementById('base-tools')!.classList.remove('hidden')
-        //             break
-        //         case 'card':
-        //             document.getElementById('card-tools')!.classList.remove('hidden')
-        //             break
-        //         case 'tile':
-        //             document.getElementById('tile-tools')!.classList.remove('hidden')
-        //             break
-        //     }
-        // })
+    getSelect(selectId) {
+        return document.getElementById(selectId);
     }
-    primaryMouseDown() {
-        this.mouseData.primaryPressed = true;
-        const gridX = this.camera.gridX(this.mouseData.canvasX, this.canvas.width);
-        const gridY = this.camera.gridY(this.mouseData.canvasY, this.canvas.height);
-        if (this.puzzle.contains(gridX, gridY)) {
-            this.controlSelection.x = gridX;
-            this.controlSelection.y = gridY;
+    getInput(checkboxId) {
+        return document.getElementById(checkboxId);
+    }
+    // #######  #     #  #######  #     #  #######   #####   
+    // #        #     #  #        ##    #     #     #     #  
+    // #        #     #  #        # #   #     #     #        
+    // ####     #     #  ####     #  #  #     #      #####   
+    // #         #   #   #        #   # #     #           #  
+    // #          # #    #        #    ##     #     #     #  
+    // #######     #     #######  #     #     #      #####   
+    addEventListeners() {
+        window.addEventListener('resize', () => { this.resize(); });
+        window.addEventListener('contextmenu', e => { this.contextMenu(e); });
+        window.addEventListener('keydown', e => { this.keyDown(e); });
+        window.addEventListener('keyup', e => { this.keyUp(e); });
+        this.canvas.addEventListener('mousedown', e => { this.mouseDown(e); });
+        this.canvas.addEventListener('mousemove', e => { this.mouseMove(e); });
+        this.canvas.addEventListener('mouseup', e => { this.mouseUp(e); });
+        this.canvas.addEventListener('mouseleave', () => { this.mouseLeave(); });
+        this.canvas.addEventListener('wheel', e => { this.mouseWheel(e); });
+        document.getElementById('grow-east').addEventListener('mousedown', () => { this.growEast(); });
+        document.getElementById('grow-south').addEventListener('mousedown', () => { this.growSouth(); });
+        document.getElementById('grow-west').addEventListener('mousedown', () => { this.growWest(); });
+        document.getElementById('grow-north').addEventListener('mousedown', () => { this.growNorth(); });
+        document.getElementById('shrink-east').addEventListener('mousedown', () => { this.shrinkEast(); });
+        document.getElementById('shrink-south').addEventListener('mousedown', () => { this.shrinkSouth(); });
+        document.getElementById('shrink-west').addEventListener('mousedown', () => { this.shrinkWest(); });
+        document.getElementById('shrink-north').addEventListener('mousedown', () => { this.shrinkNorth(); });
+        document.getElementById('zoom-button').addEventListener('mousedown', () => { this.zoom(); });
+    }
+    //  #####   ######    #####   #     #  
+    // #     #  #     #  #     #  #     #  
+    // #        #     #  #     #  #     #  
+    // #        ######   #     #  #  #  #  
+    // #   ###  #   #    #     #  # # # #  
+    // #     #  #    #   #     #  ##   ##  
+    //  #####   #     #   #####   #     #  
+    growEast() {
+        this.puzzle.growEast();
+    }
+    growSouth() {
+        this.puzzle.growSouth();
+    }
+    growWest() {
+        this.puzzle.growWest();
+        this.camera.shiftX(1);
+        this.controlGridX++;
+    }
+    growNorth() {
+        this.puzzle.growNorth();
+        this.camera.shiftY(1);
+        this.controlGridY++;
+    }
+    //  #####   #     #  ######   #######  #     #  #     #  
+    // #     #  #     #  #     #     #     ##    #  #    #   
+    // #        #     #  #     #     #     # #   #  #   #    
+    //  #####   #######  ######      #     #  #  #  ####     
+    //       #  #     #  #   #       #     #   # #  #   #    
+    // #     #  #     #  #    #      #     #    ##  #    #   
+    //  #####   #     #  #     #  #######  #     #  #     #  
+    // TODO: Load data into selects on control move
+    shrinkEast() {
+        if (!this.puzzle.shrinkEast())
+            return;
+        if (this.controlGridX > this.puzzle.width() - 1) {
+            this.controlGridX--;
         }
     }
-    secondaryMouseDown() {
-        this.mouseData.secondaryPressed = true;
+    shrinkSouth() {
+        if (!this.puzzle.shrinkSouth())
+            return;
+        if (this.controlGridY > this.puzzle.height() - 1) {
+            this.controlGridY--;
+        }
+    }
+    shrinkWest() {
+        if (!this.puzzle.shrinkWest())
+            return;
+        this.camera.shiftX(-1);
+        this.controlGridX--;
+        if (this.controlGridX < 0) {
+            this.controlGridX = 0;
+        }
+    }
+    shrinkNorth() {
+        if (!this.puzzle.shrinkNorth())
+            return;
+        this.camera.shiftY(-1);
+        this.controlGridY--;
+        if (this.controlGridY < 0) {
+            this.controlGridY = 0;
+        }
+    }
+    // #######   #####    #####   #         #####   
+    //    #     #     #  #     #  #        #     #  
+    //    #     #     #  #     #  #        #        
+    //    #     #     #  #     #  #         #####   
+    //    #     #     #  #     #  #              #  
+    //    #     #     #  #     #  #        #     #  
+    //    #      #####    #####   #######   #####   
+    numericSelectValue(selectId) {
+        return Number.parseInt(document.getElementById(selectId).value);
+    }
+    layer() {
+        return this.numericSelectValue('layer-select');
+    }
+    tool() {
+        let selectId = '';
+        switch (this.layer()) {
+            case Layers.Base:
+                selectId = 'base-tool-select';
+                break;
+            case Layers.Card:
+                selectId = 'card-tool-select';
+                break;
+            case Layers.Tile:
+                selectId = 'tile-tool-select';
+                break;
+        }
+        return this.numericSelectValue(selectId);
+    }
+    // ######      #      #####   #######  
+    // #     #    # #    #     #  #        
+    // #     #   #   #   #        #        
+    // ######   #######   #####   ####     
+    // #     #  #     #        #  #        
+    // #     #  #     #  #     #  #        
+    // ######   #     #   #####   #######  
+    setIntegerSelectValue(selectId, type) { this.getSelect(selectId).value = type + ''; }
+    getIntegerSelectValue(selectId) { return Number.parseInt(this.getSelect(selectId).value); }
+    getCheckboxChecked(checkboxId) { return this.getInput(checkboxId).checked; }
+    base() {
+        const type = this.getIntegerSelectValue('base-type-select');
+        const rule = this.getIntegerSelectValue('base-rule-select');
+        const color = this.getIntegerSelectValue('base-color-select');
+        const count = this.getIntegerSelectValue('base-count-select');
+        const axis = this.getIntegerSelectValue('base-axis-select');
+        const direction = this.getIntegerSelectValue('base-direction-select');
+        const spin = this.getIntegerSelectValue('base-spin-select');
+        const power = this.getIntegerSelectValue('base-power-select');
+        const shape = this.baseShape();
+        const fixed = this.getCheckboxChecked('base-fixed-checkbox');
+        const visible = this.getCheckboxChecked('base-visible-checkbox');
+        return new Base(type, rule, color, count, axis, direction, shape, spin, 0, power, fixed, visible);
+    }
+    baseShape() {
+        let shape = 0;
+        let checkboxes = document.getElementById('base-shape-grid').children;
+        for (let i = 0; i < checkboxes.length; i++) {
+            const checkbox = checkboxes[i];
+            if (!checkbox.checked)
+                continue;
+            shape |= 1 << i;
+        }
+        return shape;
+    }
+    createSingleBase() {
+        const base = this.base();
+        this.puzzle.insertSingleBase(base, this.mouseDownGridX, this.mouseDownGridY);
+    }
+    //  #####    #####   #     #  #     #  #######   #####   #######  
+    // #     #  #     #  ##    #  ##    #  #        #     #     #     
+    // #        #     #  # #   #  # #   #  #        #           #     
+    // #        #     #  #  #  #  #  #  #  ####     #           #     
+    // #        #     #  #   # #  #   # #  #        #           #     
+    // #     #  #     #  #    ##  #    ##  #        #     #     #     
+    //  #####    #####   #     #  #     #  #######   #####      #     
+    connectGridX(puzzleX) { return Math.floor(puzzleX - 0.5 + ConnectionToggleRadius); }
+    connectGridY(puzzleY) { return Math.floor(puzzleY - 0.5 + ConnectionToggleRadius); }
+    distanceSquared(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return dx * dx + dy * dy;
+    }
+    connectDirection(puzzleX, puzzleY, gridX, gridY) {
+        const centerX = gridX + 0.5;
+        const centerY = gridY + 0.5;
+        const outerX = gridX + 1;
+        const outerY = gridY + 1;
+        if (this.distanceSquared(outerX, centerY, puzzleX, puzzleY) < ConnectionToggleRadiusSquared) {
+            return Directions.East;
+        }
+        else if (this.distanceSquared(centerX, outerY, puzzleX, puzzleY) < ConnectionToggleRadiusSquared) {
+            return Directions.South;
+        }
+        else if (this.distanceSquared(outerX, outerY, puzzleX, puzzleY) < ConnectionToggleRadiusSquared) {
+            return Directions.Southeast;
+        }
+        return Directions.None;
+    }
+    editBaseConnection(connect) {
+        const puzzleX = this.camera.puzzleX(this.mouseX, this.canvas.width);
+        const puzzleY = this.camera.puzzleY(this.mouseY, this.canvas.height);
+        const gridX = this.connectGridX(puzzleX);
+        const gridY = this.connectGridY(puzzleY);
+        const direction = this.connectDirection(puzzleX, puzzleY, gridX, gridY);
+        if (direction === Directions.None)
+            return;
+        switch (direction) {
+            case Directions.East:
+                if (!this.puzzle.canBaseConnectEast(gridX, gridY))
+                    break;
+                if (connect) {
+                    this.puzzle.connectBaseEast(gridX, gridY);
+                }
+                else {
+                    this.puzzle.disconnectBaseEast(gridX, gridY);
+                }
+                break;
+            case Directions.South:
+                if (!this.puzzle.canBaseConnectSouth(gridX, gridY))
+                    break;
+                if (connect) {
+                    this.puzzle.connectBaseSouth(gridX, gridY);
+                }
+                else {
+                    this.puzzle.disconnectBaseSouth(gridX, gridY);
+                }
+                break;
+            case Directions.Southeast:
+                if (!this.puzzle.canBaseConnectSoutheast(gridX, gridY))
+                    break;
+                if (connect) {
+                    this.puzzle.connectBaseSoutheast(gridX, gridY);
+                }
+                else {
+                    this.puzzle.disconnectBaseSoutheast(gridX, gridY);
+                }
+                break;
+        }
+    }
+    // #     #   #####   #     #   #####   #######  
+    // ##   ##  #     #  #     #  #     #  #        
+    // # # # #  #     #  #     #  #        #        
+    // #  #  #  #     #  #     #   #####   ####     
+    // #     #  #     #  #     #        #  #        
+    // #     #  #     #  #     #  #     #  #        
+    // #     #   #####    #####    #####   #######  
+    contextMenu(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    mouseDown(e) {
+        if (e.button !== 0)
+            return;
+        this.mousePressed = true;
+        this.mouseDownGridX = this.camera.gridX(e.offsetX, this.canvas.width);
+        this.mouseDownGridY = this.camera.gridY(e.offsetY, this.canvas.height);
+        if (this.puzzle.contains(this.mouseDownGridX, this.mouseDownGridY)) {
+            this.controlGridX = this.mouseDownGridX;
+            this.controlGridY = this.mouseDownGridY;
+        }
+        switch (this.layer()) {
+            case Layers.Base: {
+                switch (this.tool()) {
+                    case Tools.CreateSingle: {
+                        this.createSingleBase();
+                        break;
+                    }
+                    case Tools.Connect: {
+                        this.editBaseConnection(true);
+                        break;
+                    }
+                    case Tools.Disconnect: {
+                        this.editBaseConnection(false);
+                        break;
+                    }
+                }
+                break;
+            }
+            case Layers.Card: {
+                break;
+            }
+            case Layers.Tile: {
+                break;
+            }
+        }
     }
     mouseMove(e) {
-        if (this.mouseData.primaryPressed && this.spacePressed) {
-            const dx = e.offsetX - this.mouseData.canvasX;
-            const dy = e.offsetY - this.mouseData.canvasY;
-            this.camera.pan(dx, dy);
+        if (this.mousePressed) {
+            if (this.spacePressed) {
+                const dx = e.offsetX - this.mouseX;
+                const dy = e.offsetY - this.mouseY;
+                this.camera.pan(dx, dy);
+            }
         }
-        this.mouseData.canvasX = e.offsetX;
-        this.mouseData.canvasY = e.offsetY;
+        this.mouseX = e.offsetX;
+        this.mouseY = e.offsetY;
     }
     mouseWheel(e) {
         if (e.deltaY > 0) {
-            this.camera.zoomOut(this.mouseData.canvasX, this.mouseData.canvasY, this.canvas.width, this.canvas.height);
+            this.camera.zoomOut(this.mouseX, this.mouseY, this.canvas.width, this.canvas.height);
         }
         else {
-            this.camera.zoomIn(this.mouseData.canvasX, this.mouseData.canvasY, this.canvas.width, this.canvas.height);
+            this.camera.zoomIn(this.mouseX, this.mouseY, this.canvas.width, this.canvas.height);
         }
     }
-    primaryMouseUp() {
-        this.mouseData.primaryPressed = false;
-    }
-    secondaryMouseUp() {
-        this.mouseData.secondaryPressed = false;
+    mouseUp(e) {
+        if (e.button !== 0)
+            return;
+        this.mousePressed = false;
+        this.mouseDownGridX = -1;
+        this.mouseDownGridY = -1;
+        this.mouseGridX = -1;
+        this.mouseGridY = -1;
     }
     mouseLeave() {
-        this.primaryMouseUp();
-        this.secondaryMouseUp();
+        this.mousePressed = false;
+        this.mouseDownGridX = -1;
+        this.mouseDownGridY = -1;
+        this.mouseGridX = -1;
+        this.mouseGridY = -1;
+    }
+    // #     #  #######  #     #   #####   
+    // #    #   #         #   #   #     #  
+    // #   #    #          # #    #        
+    // ####     ####        #      #####   
+    // #   #    #           #           #  
+    // #    #   #           #     #     #  
+    // #     #  #######     #      #####   
+    keyDown(e) {
+        switch (e.code) {
+            case 'Space': {
+                this.spacePressed = true;
+                break;
+            }
+        }
+    }
+    keyUp(e) {
+        switch (e.code) {
+            case 'Space': {
+                this.spacePressed = false;
+                break;
+            }
+        }
+    }
+    // ######   #######  #     #  ######   #######  ######   
+    // #     #  #        ##    #  #     #  #        #     #  
+    // #     #  #        # #   #  #     #  #        #     #  
+    // ######   ####     #  #  #  #     #  ####     ######   
+    // #   #    #        #   # #  #     #  #        #   #    
+    // #    #   #        #    ##  #     #  #        #    #   
+    // #     #  #######  #     #  ######   #######  #     #  
+    zoom() {
+        this.camera.autoZoom(this.puzzle.width(), this.puzzle.height(), this.canvas.width, this.canvas.height);
     }
     resize() {
         const canvasBounds = this.canvas.getBoundingClientRect();
@@ -235,27 +474,46 @@ export default class Editor {
         const canvasWidth = this.canvas.width;
         const canvasHeight = this.canvas.height;
         this.context.clearRect(0, 0, canvasWidth, canvasHeight);
+        this.context.imageSmoothingEnabled = false;
         this.renderBase(canvasWidth, canvasHeight);
         this.renderGrid(canvasWidth, canvasHeight);
         this.renderInfo(canvasWidth, canvasHeight);
+        switch (this.layer()) {
+            case Layers.Base: {
+                switch (this.tool()) {
+                    case Tools.Connect: {
+                        this.renderBaseConnectionToggles(canvasWidth, canvasHeight);
+                        break;
+                    }
+                    case Tools.Disconnect: {
+                        this.renderBaseConnectionToggles(canvasWidth, canvasHeight);
+                        break;
+                    }
+                }
+                break;
+            }
+            case Layers.Card: {
+                break;
+            }
+            case Layers.Tile: {
+                break;
+            }
+        }
         this.renderHover(canvasWidth, canvasHeight);
         this.renderControlSelection(canvasWidth, canvasHeight);
-        // this.renderBaseConnections(canvasWidth, canvasHeight)
-        // const scalar = 0.5
-        // this.context.drawImage(Images.Tilesets, 0, 0, Images.Tilesets.width * scalar, Images.Tilesets.height * scalar)
     }
     renderGrid(canvasWidth, canvasHeight) {
         const xEast = this.camera.canvasX(0, canvasWidth);
-        const xWest = this.camera.canvasX(this.puzzle.width, canvasWidth);
+        const xWest = this.camera.canvasX(this.puzzle.width(), canvasWidth);
         const yNorth = this.camera.canvasY(0, canvasHeight);
-        const ySouth = this.camera.canvasY(this.puzzle.height, canvasHeight);
+        const ySouth = this.camera.canvasY(this.puzzle.height(), canvasHeight);
         this.context.beginPath();
-        for (let i = 0; i <= this.puzzle.width; i++) {
+        for (let i = 0; i <= this.puzzle.width(); i++) {
             const canvasX = this.camera.canvasX(i, canvasWidth);
             this.context.moveTo(canvasX, yNorth);
             this.context.lineTo(canvasX, ySouth);
         }
-        for (let i = 0; i <= this.puzzle.height; i++) {
+        for (let i = 0; i <= this.puzzle.height(); i++) {
             const canvasY = this.camera.canvasY(i, canvasHeight);
             this.context.moveTo(xEast, canvasY);
             this.context.lineTo(xWest, canvasY);
@@ -265,10 +523,10 @@ export default class Editor {
         this.context.stroke();
     }
     renderInfo(canvasWidth, canvasHeight) {
-        const x = this.camera.gridX(this.mouseData.canvasX, canvasWidth);
+        const x = this.camera.gridX(this.mouseX, canvasWidth);
         if (!this.puzzle.containsX(x))
             return;
-        const y = this.camera.gridY(this.mouseData.canvasY, canvasHeight);
+        const y = this.camera.gridY(this.mouseY, canvasHeight);
         if (!this.puzzle.containsY(y))
             return;
         this.context.font = '16px sans-serif';
@@ -276,10 +534,10 @@ export default class Editor {
         this.context.fillText(`(${x}, ${y})`, 5, canvasHeight - 7);
     }
     renderHover(canvasWidth, canvasHeight) {
-        const x = this.camera.gridX(this.mouseData.canvasX, canvasWidth);
+        const x = this.camera.gridX(this.mouseX, canvasWidth);
         if (!this.puzzle.containsX(x))
             return;
-        const y = this.camera.gridY(this.mouseData.canvasY, canvasHeight);
+        const y = this.camera.gridY(this.mouseY, canvasHeight);
         if (!this.puzzle.containsY(y))
             return;
         const canvasX = this.camera.canvasX(x, canvasWidth);
@@ -289,13 +547,62 @@ export default class Editor {
         this.context.strokeRect(canvasX, canvasY, this.camera.scale, this.camera.scale);
     }
     renderControlSelection(canvasWidth, canvasHeight) {
-        const canvasX = this.camera.canvasX(this.controlSelection.x, canvasWidth);
-        const canvasY = this.camera.canvasY(this.controlSelection.y, canvasHeight);
+        const canvasX = this.camera.canvasX(this.controlGridX, canvasWidth);
+        const canvasY = this.camera.canvasY(this.controlGridY, canvasHeight);
         this.context.lineWidth = 2;
         this.context.strokeStyle = 'white';
         this.context.strokeRect(canvasX, canvasY, this.camera.scale, this.camera.scale);
     }
     renderBase(canvasWidth, canvasHeight) {
+        for (let i = 0; i < this.puzzle.width(); i++) {
+            const x = this.camera.canvasX(i, canvasWidth);
+            for (let j = 0; j < this.puzzle.height(); j++) {
+                const y = this.camera.canvasY(j, canvasHeight);
+                const base = this.puzzle.baseGrid[i][j];
+                this.context.drawImage(Images.Tilesets, Images.OffsetMap[base.connections], BaseTypes.TilesetOffset[base.type], Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
+                let offset = BaseRules.Offsets[base.rule];
+                switch (base.rule) {
+                    case BaseRules.Area:
+                    case BaseRules.Groups:
+                    case BaseRules.Neighbors:
+                    case BaseRules.Orthogonal:
+                    case BaseRules.Order:
+                    case BaseRules.Relative:
+                    case BaseRules.Rules:
+                    case BaseRules.States:
+                        offset += (base.count - 1) * Images.CellSizePixels;
+                        break;
+                    case BaseRules.Adjacent:
+                        offset += base.count * Images.CellSizePixels;
+                        break;
+                    case BaseRules.Symmetric:
+                        offset += (base.axis - 1) * Images.CellSizePixels;
+                        break;
+                    case BaseRules.Length:
+                        offset += (base.count - 1) * Images.CellSizePixels + (base.axis - 1) * 5 * Images.CellSizePixels;
+                        break;
+                }
+                this.context.drawImage(Images.Icons, offset, (base.color - 1) * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
+                if (base.fixed) {
+                    this.context.drawImage(Images.Tilesets, Images.OffsetMap[base.connections], Images.OffsetTemplateScrews, Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
+                }
+                // this.context.fillText(base.connections.toString(2).padStart(8, '0'), x + 5, y + 20)
+            }
+        }
+    }
+    renderBaseConnectionToggles(canvasWidth, canvasHeight) {
+        const potentialBaseConnections = this.puzzle.potentialBaseConnections();
+        this.context.beginPath();
+        const radius = this.camera.scale * ConnectionToggleRadius;
+        for (const connection of potentialBaseConnections) {
+            const vector = Directions.Vectors[connection.direction];
+            const x = this.camera.canvasX(connection.gridX + 0.5 * (1 + vector.dx), canvasWidth);
+            const y = this.camera.canvasY(connection.gridY + 0.5 * (1 + vector.dy), canvasHeight);
+            this.context.moveTo(x, y);
+            this.context.arc(x, y, radius, 0, Tau);
+        }
+        this.context.fillStyle = '#ffffff20';
+        this.context.fill();
     }
     renderCards() {
     }

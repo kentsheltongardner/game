@@ -186,10 +186,10 @@ main {
     min-width: 0;
 }
 
-#shape-grid-container {
+#base-shape-grid-container {
     display: flex;
 }
-#shape-grid {
+#base-shape-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     width: max-content;
