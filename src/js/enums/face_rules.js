@@ -1,5 +1,5 @@
 import Images from '../images.js';
-export default class CardRules {
+export default class FaceRules {
     static None = 0;
     static Visible = 1; // Visible
     static Hidden = 2; // Hidden

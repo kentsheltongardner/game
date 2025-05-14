@@ -2,10 +2,10 @@ import Camera from './camera.js';
 import Axes from './enums/axes.js';
 import BaseRules from './enums/base_rules.js';
 import BaseTypes from './enums/base_types.js';
-import CardRules from './enums/card_rules.js';
+import FaceRules from './enums/face_rules.js';
 import Colors from './enums/colors.js';
 import Directions from './enums/directions.js';
-import Faces from './enums/faces.js';
+import Faces from './enums/face_types.js';
 import Spins from './enums/spins.js';
 import Watermarks from './enums/watermarks.js';
 import Puzzle from './puzzle.js';
@@ -14,6 +14,7 @@ import Images from './images.js';
 import Layers from './enums/layers.js';
 import Tools from './enums/tools.js';
 import Base from './objects/base.js';
+import Face from './objects/face.js';
 const ConnectionToggleRadius = 0.125;
 const ConnectionToggleRadiusSquared = ConnectionToggleRadius * ConnectionToggleRadius;
 const Tau = Math.PI * 2;
@@ -33,6 +34,7 @@ export default class Editor {
     spacePressed = false;
     puzzle = new Puzzle();
     constructor() {
+        this.puzzle.loadDefault();
         const cameraX = this.puzzle.width() / 2;
         const cameraY = this.puzzle.height() / 2;
         this.camera = new Camera(cameraX, cameraY);
@@ -64,21 +66,16 @@ export default class Editor {
         this.populateSelect('base-direction-select', Directions.Names);
         this.populateIntegerSelect('base-count-select', 7);
         this.populateIntegerSelect('base-power-select', 3);
-        this.populateSelect('top-card-face-select', Faces.Names);
-        this.populateSelect('top-card-watermark-select', Watermarks.Names);
-        this.populateSelect('top-card-rule-select', CardRules.Names);
-        this.populateSelect('top-card-color-select', Colors.Names);
-        this.populateSelect('top-card-direction-select', Colors.Names);
-        this.populateSelect('bottom-card-face-select', Faces.Names);
-        this.populateSelect('bottom-card-watermark-select', Watermarks.Names);
-        this.populateSelect('bottom-card-rule-select', CardRules.Names);
-        this.populateSelect('bottom-card-color-select', Colors.Names);
-        this.populateSelect('bottom-card-direction-select', Directions.Names);
-        this.populateSelect('bottom-card-face-select', Faces.Names);
-        this.populateSelect('bottom-card-watermark-select', Watermarks.Names);
-        this.populateSelect('bottom-card-rule-select', CardRules.Names);
-        this.populateSelect('bottom-card-color-select', Colors.Names);
-        this.populateSelect('bottom-card-direction-select', Directions.Names);
+        this.populateSelect('top-face-type-select', Faces.Names);
+        this.populateSelect('top-face-watermark-select', Watermarks.Names);
+        this.populateSelect('top-face-rule-select', FaceRules.Names);
+        this.populateSelect('top-face-color-select', Colors.Names);
+        this.populateSelect('top-face-direction-select', Directions.Names);
+        this.populateSelect('bottom-face-type-select', Faces.Names);
+        this.populateSelect('bottom-face-watermark-select', Watermarks.Names);
+        this.populateSelect('bottom-face-rule-select', FaceRules.Names);
+        this.populateSelect('bottom-face-color-select', Colors.Names);
+        this.populateSelect('bottom-face-direction-select', Directions.Names);
         this.populateSelect('tile-material-select', Materials.Names);
         this.populateSelect('tile-direction-select', Directions.Names);
         this.populateSelect('tile-spin-select', Spins.Names);
@@ -112,12 +109,11 @@ export default class Editor {
             select.appendChild(option);
         }
     }
-    getSelect(selectId) {
-        return document.getElementById(selectId);
-    }
-    getInput(checkboxId) {
-        return document.getElementById(checkboxId);
-    }
+    getSelect(selectId) { return document.getElementById(selectId); }
+    getInput(inputUId) { return document.getElementById(inputUId); }
+    setIntegerSelectValue(selectId, type) { this.getSelect(selectId).value = type + ''; }
+    getIntegerSelectValue(selectId) { return Number.parseInt(this.getSelect(selectId).value); }
+    getCheckboxChecked(checkboxId) { return this.getInput(checkboxId).checked; }
     // #######  #     #  #######  #     #  #######   #####   
     // #        #     #  #        ##    #     #     #     #  
     // #        #     #  #        # #   #     #     #        
@@ -144,6 +140,14 @@ export default class Editor {
         document.getElementById('shrink-west').addEventListener('mousedown', () => { this.shrinkWest(); });
         document.getElementById('shrink-north').addEventListener('mousedown', () => { this.shrinkNorth(); });
         document.getElementById('zoom-button').addEventListener('mousedown', () => { this.zoom(); });
+        const baseInputs = document.getElementsByClassName('base-input');
+        for (const baseInput of baseInputs) {
+            baseInput.addEventListener('change', () => { this.baseChanged(); });
+        }
+        const faceInputs = document.getElementsByClassName('face-input');
+        for (const faceInput of faceInputs) {
+            faceInput.addEventListener('change', () => { this.cardChanged(); });
+        }
     }
     //  #####   ######    #####   #     #  
     // #     #  #     #  #     #  #     #  
@@ -181,6 +185,8 @@ export default class Editor {
             return;
         if (this.controlGridX > this.puzzle.width() - 1) {
             this.controlGridX--;
+            this.selectBase(this.controlGridX, this.controlGridY);
+            this.selectCard(this.controlGridX, this.controlGridY);
         }
     }
     shrinkSouth() {
@@ -188,6 +194,8 @@ export default class Editor {
             return;
         if (this.controlGridY > this.puzzle.height() - 1) {
             this.controlGridY--;
+            this.selectBase(this.controlGridX, this.controlGridY);
+            this.selectCard(this.controlGridX, this.controlGridY);
         }
     }
     shrinkWest() {
@@ -197,6 +205,8 @@ export default class Editor {
         this.controlGridX--;
         if (this.controlGridX < 0) {
             this.controlGridX = 0;
+            this.selectBase(this.controlGridX, this.controlGridY);
+            this.selectCard(this.controlGridX, this.controlGridY);
         }
     }
     shrinkNorth() {
@@ -206,6 +216,8 @@ export default class Editor {
         this.controlGridY--;
         if (this.controlGridY < 0) {
             this.controlGridY = 0;
+            this.selectBase(this.controlGridX, this.controlGridY);
+            this.selectCard(this.controlGridX, this.controlGridY);
         }
     }
     // #######   #####    #####   #         #####   
@@ -243,10 +255,7 @@ export default class Editor {
     // #     #  #     #        #  #        
     // #     #  #     #  #     #  #        
     // ######   #     #   #####   #######  
-    setIntegerSelectValue(selectId, type) { this.getSelect(selectId).value = type + ''; }
-    getIntegerSelectValue(selectId) { return Number.parseInt(this.getSelect(selectId).value); }
-    getCheckboxChecked(checkboxId) { return this.getInput(checkboxId).checked; }
-    base() {
+    base(connections = Directions.BitsNone) {
         const type = this.getIntegerSelectValue('base-type-select');
         const rule = this.getIntegerSelectValue('base-rule-select');
         const color = this.getIntegerSelectValue('base-color-select');
@@ -258,11 +267,11 @@ export default class Editor {
         const shape = this.baseShape();
         const fixed = this.getCheckboxChecked('base-fixed-checkbox');
         const visible = this.getCheckboxChecked('base-visible-checkbox');
-        return new Base(type, rule, color, count, axis, direction, shape, spin, 0, power, fixed, visible);
+        return new Base(type, rule, color, count, axis, direction, shape, spin, connections, power, fixed, visible);
     }
     baseShape() {
         let shape = 0;
-        let checkboxes = document.getElementById('base-shape-grid').children;
+        const checkboxes = document.getElementById('base-shape-grid').children;
         for (let i = 0; i < checkboxes.length; i++) {
             const checkbox = checkboxes[i];
             if (!checkbox.checked)
@@ -271,9 +280,122 @@ export default class Editor {
         }
         return shape;
     }
-    createSingleBase() {
+    createSingleBase(gridX, gridY) {
         const base = this.base();
-        this.puzzle.insertSingleBase(base, this.mouseDownGridX, this.mouseDownGridY);
+        this.puzzle.insertSingleBase(base, gridX, gridY);
+    }
+    selectBase(gridX, gridY) {
+        const base = this.puzzle.baseGrid[gridX][gridY];
+        this.getSelect('base-type-select').value = base.type + '';
+        this.getSelect('base-rule-select').value = base.rule + '';
+        this.getSelect('base-color-select').value = base.color + '';
+        this.getSelect('base-count-select').value = base.count + '';
+        this.getSelect('base-axis-select').value = base.axis + '';
+        this.getSelect('base-direction-select').value = base.direction + '';
+        this.getSelect('base-spin-select').value = base.spin + '';
+        this.getSelect('base-power-select').value = base.power + '';
+        this.getInput('base-fixed-checkbox').checked = base.fixed;
+        this.getInput('base-visible-checkbox').checked = base.visible;
+        const checkboxes = document.getElementById('base-shape-grid').children;
+        for (let i = 0; i < checkboxes.length; i++) {
+            const checkbox = checkboxes[i];
+            const flag = (1 << i);
+            checkbox.checked = (flag & base.shape) === flag;
+        }
+    }
+    baseChanged() {
+        if (this.layer() === Layers.Base && this.tool() === Tools.Edit) {
+            const base = this.puzzle.baseGrid[this.controlGridX][this.controlGridY];
+            const newBase = this.base(base.connections);
+            this.puzzle.updateBase(this.controlGridX, this.controlGridY, newBase);
+        }
+    }
+    //  #####      #     ######   ######   
+    // #     #    # #    #     #  #     #  
+    // #         #   #   #     #  #     #  
+    // #        #######  ######   #     #  
+    // #        #     #  #   #    #     #  
+    // #     #  #     #  #    #   #     #  
+    //  #####   #     #  #     #  ######   
+    // To connect cards, have cards numbered top to bottom, left to right
+    // Specify the set of connections to make
+    // A connection is denoted as A, B, cardinal direction
+    // Save connections for all cards being modified
+    // Make changes to connections, and test validity
+    // If not valid, revert
+    // A connection is invalid if
+    //  - It connects to a face with a different side or material
+    //  - It results in connections different from those of its opposing face
+    //  - It causes cards to intersect
+    //      A card intersection occurs when
+    //      - In the case of a flat connection
+    //          An existing connection is neither above or below the connection
+    //      - In the case of a fold connection
+    //          An existing connection is neither inside or outside the connection
+    topFace() {
+        const type = this.getIntegerSelectValue('top-face-type-select');
+        const watermark = this.getIntegerSelectValue('top-face-watermark-select');
+        const rule = this.getIntegerSelectValue('top-face-rule-select');
+        const color = this.getIntegerSelectValue('top-face-color-select');
+        const direction = this.getIntegerSelectValue('top-face-direction-select');
+        return new Face(type, watermark, rule, color, direction);
+    }
+    bottomFace() {
+        const type = this.getIntegerSelectValue('bottom-face-type-select');
+        const watermark = this.getIntegerSelectValue('bottom-face-watermark-select');
+        const rule = this.getIntegerSelectValue('bottom-face-rule-select');
+        const color = this.getIntegerSelectValue('bottom-face-color-select');
+        const direction = this.getIntegerSelectValue('bottom-face-direction-select');
+        return new Face(type, watermark, rule, color, direction);
+    }
+    createSingleCard(gridX, gridY) {
+        const bottomFace = this.bottomFace();
+        const topFace = this.topFace();
+        this.puzzle.insertSingleFace(bottomFace, gridX, gridY);
+        this.puzzle.insertSingleFace(topFace, gridX, gridY);
+    }
+    selectCard(gridX, gridY) {
+        if (this.puzzle.faceGrid[gridX][gridY].length === 0) {
+            this.getSelect('top-face-type-select').value = Faces.Front + '';
+            this.getSelect('top-face-watermark-select').value = Watermarks.None + '';
+            this.getSelect('top-face-rule-select').value = FaceRules.None + '';
+            this.getSelect('top-face-color-select').value = Colors.None + '';
+            this.getSelect('top-face-direction-select').value = Directions.None + '';
+            this.getSelect('bottom-face-type-select').value = Faces.Front + '';
+            this.getSelect('bottom-face-watermark-select').value = Watermarks.None + '';
+            this.getSelect('bottom-face-rule-select').value = FaceRules.None + '';
+            this.getSelect('bottom-face-color-select').value = Colors.None + '';
+            this.getSelect('bottom-face-direction-select').value = Directions.None + '';
+            return;
+        }
+        const faceStack = this.puzzle.faceGrid[gridX][gridY];
+        const stackHeight = faceStack.length;
+        const topFace = faceStack[stackHeight - 1];
+        const bottomFace = faceStack[stackHeight - 2];
+        this.getSelect('top-face-type-select').value = topFace.type + '';
+        this.getSelect('top-face-watermark-select').value = topFace.watermark + '';
+        this.getSelect('top-face-rule-select').value = topFace.rule + '';
+        this.getSelect('top-face-color-select').value = topFace.color + '';
+        this.getSelect('top-face-direction-select').value = topFace.direction + '';
+        this.getSelect('bottom-face-type-select').value = bottomFace.type + '';
+        this.getSelect('bottom-face-watermark-select').value = bottomFace.watermark + '';
+        this.getSelect('bottom-face-rule-select').value = bottomFace.rule + '';
+        this.getSelect('bottom-face-color-select').value = bottomFace.color + '';
+        this.getSelect('bottom-face-direction-select').value = bottomFace.direction + '';
+    }
+    cardChanged() {
+        if (this.layer() === Layers.Card && this.tool() === Tools.Edit) {
+            const faceStack = this.puzzle.faceGrid[this.controlGridX][this.controlGridY];
+            const stackHeight = faceStack.length;
+            if (stackHeight === 0)
+                return;
+            // const zTop          = stackHeight - 1
+            // const zBottom       = stackHeight - 2
+            // const topFace       = this.topFace(this.controlGridX, this.controlGridY, faceStack[zTop].connections, faceStack[zTop].creases)
+            // const bottomFace    = this.bottomFace(this.controlGridX, this.controlGridY, faceStack[zBottom].connections, faceStack[zBottom].creases)
+            // this.puzzle.updateFace(this.controlGridX, this.controlGridY, zTop, topFace)
+            // this.puzzle.updateFace(this.controlGridX, this.controlGridY, zBottom, bottomFace)
+        }
     }
     //  #####    #####   #     #  #     #  #######   #####   #######  
     // #     #  #     #  ##    #  ##    #  #        #     #     #     
@@ -346,6 +468,32 @@ export default class Editor {
                 break;
         }
     }
+    // editCardConnection(connect: boolean) {
+    //     const puzzleX   = this.camera.puzzleX(this.mouseX, this.canvas.width)
+    //     const puzzleY   = this.camera.puzzleY(this.mouseY, this.canvas.height)
+    //     const gridX     = this.connectGridX(puzzleX)
+    //     const gridY     = this.connectGridY(puzzleY)
+    //     const direction = this.connectDirection(puzzleX, puzzleY, gridX, gridY)
+    //     if (direction === Directions.None) return
+    //     switch (direction) {
+    //         case Directions.East:
+    //             if (!this.puzzle.canCardConnect(gridX, gridY, 1, 0)) break
+    //             if (connect) {
+    //                 this.puzzle.connectCardEast(gridX, gridY)
+    //             } else {
+    //                 this.puzzle.disconnectCardEast(gridX, gridY)
+    //             }
+    //         break
+    //         case Directions.South:
+    //             if (!this.puzzle.canCardConnect(gridX, gridY, 0, 1)) break
+    //             if (connect) {
+    //                 this.puzzle.connectCardSouth(gridX, gridY)
+    //             } else {
+    //                 this.puzzle.disconnectCardSouth(gridX, gridY)
+    //             }
+    //         break
+    //     }
+    // }
     // #     #   #####   #     #   #####   #######  
     // ##   ##  #     #  #     #  #     #  #        
     // # # # #  #     #  #     #  #        #        
@@ -363,35 +511,45 @@ export default class Editor {
         this.mousePressed = true;
         this.mouseDownGridX = this.camera.gridX(e.offsetX, this.canvas.width);
         this.mouseDownGridY = this.camera.gridY(e.offsetY, this.canvas.height);
-        if (this.puzzle.contains(this.mouseDownGridX, this.mouseDownGridY)) {
-            this.controlGridX = this.mouseDownGridX;
-            this.controlGridY = this.mouseDownGridY;
-        }
+        if (!this.puzzle.contains(this.mouseDownGridX, this.mouseDownGridY))
+            return;
+        this.controlGridX = this.mouseDownGridX;
+        this.controlGridY = this.mouseDownGridY;
         switch (this.layer()) {
             case Layers.Base: {
                 switch (this.tool()) {
-                    case Tools.CreateSingle: {
-                        this.createSingleBase();
+                    case Tools.Create:
+                        this.createSingleBase(this.controlGridX, this.controlGridY);
                         break;
-                    }
-                    case Tools.Connect: {
+                    case Tools.Edit:
+                        break;
+                    case Tools.Connect:
                         this.editBaseConnection(true);
                         break;
-                    }
-                    case Tools.Disconnect: {
+                    case Tools.Disconnect:
                         this.editBaseConnection(false);
                         break;
-                    }
                 }
                 break;
             }
             case Layers.Card: {
+                switch (this.tool()) {
+                    case Tools.Create:
+                        this.createSingleCard(this.controlGridX, this.controlGridY);
+                        break;
+                    case Tools.RecursiveDelete:
+                        this.puzzle.recursiveDelete(this.controlGridX, this.controlGridY);
+                        break;
+                }
                 break;
             }
             case Layers.Tile: {
                 break;
             }
         }
+        // update selected cell
+        this.selectBase(this.controlGridX, this.controlGridY);
+        this.selectCard(this.controlGridX, this.controlGridY);
     }
     mouseMove(e) {
         if (this.mousePressed) {
@@ -400,9 +558,62 @@ export default class Editor {
                 const dy = e.offsetY - this.mouseY;
                 this.camera.pan(dx, dy);
             }
+            else {
+                this.mouseDrag(e);
+            }
         }
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
+    }
+    mouseDrag(e) {
+        const newControlGridX = this.camera.gridX(e.offsetX, this.canvas.width);
+        const newControlGridY = this.camera.gridY(e.offsetY, this.canvas.height);
+        if (!this.puzzle.contains(newControlGridX, newControlGridY))
+            return;
+        const dx = newControlGridX - this.controlGridX;
+        const dy = newControlGridY - this.controlGridY;
+        if (Math.abs(dx) + Math.abs(dy) !== 1)
+            return;
+        switch (this.layer()) {
+            case Layers.Base: {
+                switch (this.tool()) {
+                    case Tools.Create:
+                        this.createSingleBase(newControlGridX, newControlGridY);
+                        break;
+                }
+                break;
+            }
+            case Layers.Card: {
+                switch (this.tool()) {
+                    case Tools.Create:
+                        this.createSingleCard(newControlGridX, newControlGridY);
+                        break;
+                    case Tools.Delete:
+                        break;
+                    case Tools.Reverse:
+                        break;
+                    case Tools.Connect:
+                        this.puzzle.connectCard(this.controlGridX, this.controlGridY, dx, dy);
+                        break;
+                    case Tools.Disconnect:
+                        break;
+                    case Tools.Crease:
+                        this.puzzle.creaseCard(this.controlGridX, this.controlGridY, dx, dy);
+                        break;
+                    case Tools.FlipFold:
+                        this.puzzle.flipFoldCard(this.controlGridX, this.controlGridY, dx, dy);
+                        break;
+                }
+                break;
+            }
+            case Layers.Tile: {
+                break;
+            }
+        }
+        this.controlGridX = newControlGridX;
+        this.controlGridY = newControlGridY;
+        this.selectBase(this.controlGridX, this.controlGridY);
+        this.selectCard(this.controlGridX, this.controlGridY);
     }
     mouseWheel(e) {
         if (e.deltaY > 0) {
@@ -471,140 +682,253 @@ export default class Editor {
         requestAnimationFrame(() => { this.loop(); });
     }
     render() {
-        const canvasWidth = this.canvas.width;
-        const canvasHeight = this.canvas.height;
-        this.context.clearRect(0, 0, canvasWidth, canvasHeight);
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.context.imageSmoothingEnabled = false;
-        this.renderBase(canvasWidth, canvasHeight);
-        this.renderGrid(canvasWidth, canvasHeight);
-        this.renderInfo(canvasWidth, canvasHeight);
+        const gameCanvas = document.createElement('canvas');
+        gameCanvas.width = Images.CellSizePixels * this.puzzle.width();
+        gameCanvas.height = Images.CellSizePixels * this.puzzle.height();
+        const gameContext = gameCanvas.getContext('2d');
+        if (this.getInput('base-layer-visible').checked) {
+            this.renderBases(gameContext);
+        }
+        if (this.getInput('card-layer-visible').checked) {
+            this.renderCardShadows(gameContext);
+            this.renderFaces(gameContext);
+        }
+        this.renderGame(gameCanvas);
+        this.renderGrid();
+        this.renderInfo();
         switch (this.layer()) {
-            case Layers.Base: {
+            case Layers.Base:
                 switch (this.tool()) {
-                    case Tools.Connect: {
-                        this.renderBaseConnectionToggles(canvasWidth, canvasHeight);
+                    case Tools.Connect:
+                        this.renderBaseConnectionToggles();
                         break;
-                    }
-                    case Tools.Disconnect: {
-                        this.renderBaseConnectionToggles(canvasWidth, canvasHeight);
+                    case Tools.Disconnect:
+                        this.renderBaseConnectionToggles();
                         break;
-                    }
                 }
                 break;
-            }
-            case Layers.Card: {
+            case Layers.Card:
+                switch (this.tool()) {
+                    case Tools.Connect:
+                        // this.renderCardConnectionToggles()
+                        break;
+                    case Tools.Disconnect:
+                        // this.renderCardConnectionToggles()
+                        break;
+                }
                 break;
-            }
-            case Layers.Tile: {
+            case Layers.Tile:
                 break;
-            }
         }
-        this.renderHover(canvasWidth, canvasHeight);
-        this.renderControlSelection(canvasWidth, canvasHeight);
+        this.renderHover();
+        this.renderControlSelection();
     }
-    renderGrid(canvasWidth, canvasHeight) {
-        const xEast = this.camera.canvasX(0, canvasWidth);
-        const xWest = this.camera.canvasX(this.puzzle.width(), canvasWidth);
-        const yNorth = this.camera.canvasY(0, canvasHeight);
-        const ySouth = this.camera.canvasY(this.puzzle.height(), canvasHeight);
+    renderGame(gameCanvas) {
+        const xEast = this.camera.canvasX(this.puzzle.width(), this.canvas.width);
+        const xWest = this.camera.canvasX(0, this.canvas.width);
+        const ySouth = this.camera.canvasY(this.puzzle.height(), this.canvas.height);
+        const yNorth = this.camera.canvasY(0, this.canvas.height);
+        const width = xEast - xWest;
+        const height = ySouth - yNorth;
+        this.context.drawImage(gameCanvas, xWest, yNorth, width, height);
+    }
+    renderGrid() {
+        const xEast = this.camera.canvasX(this.puzzle.width(), this.canvas.width);
+        const xWest = this.camera.canvasX(0, this.canvas.width);
+        const ySouth = this.camera.canvasY(this.puzzle.height(), this.canvas.height);
+        const yNorth = this.camera.canvasY(0, this.canvas.height);
         this.context.beginPath();
         for (let i = 0; i <= this.puzzle.width(); i++) {
-            const canvasX = this.camera.canvasX(i, canvasWidth);
+            const canvasX = this.camera.canvasX(i, this.canvas.width);
             this.context.moveTo(canvasX, yNorth);
             this.context.lineTo(canvasX, ySouth);
         }
         for (let i = 0; i <= this.puzzle.height(); i++) {
-            const canvasY = this.camera.canvasY(i, canvasHeight);
+            const canvasY = this.camera.canvasY(i, this.canvas.height);
             this.context.moveTo(xEast, canvasY);
             this.context.lineTo(xWest, canvasY);
         }
-        this.context.lineWidth = 1;
-        this.context.strokeStyle = '#444';
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = '#0004';
         this.context.stroke();
     }
-    renderInfo(canvasWidth, canvasHeight) {
-        const x = this.camera.gridX(this.mouseX, canvasWidth);
+    renderInfo() {
+        const x = this.camera.gridX(this.mouseX, this.canvas.width);
         if (!this.puzzle.containsX(x))
             return;
-        const y = this.camera.gridY(this.mouseY, canvasHeight);
+        const y = this.camera.gridY(this.mouseY, this.canvas.height);
         if (!this.puzzle.containsY(y))
             return;
         this.context.font = '16px sans-serif';
         this.context.fillStyle = '#444';
-        this.context.fillText(`(${x}, ${y})`, 5, canvasHeight - 7);
+        this.context.fillText(`(${x}, ${y})`, 5, this.canvas.height - 7);
     }
-    renderHover(canvasWidth, canvasHeight) {
-        const x = this.camera.gridX(this.mouseX, canvasWidth);
+    renderHover() {
+        const x = this.camera.gridX(this.mouseX, this.canvas.width);
         if (!this.puzzle.containsX(x))
             return;
-        const y = this.camera.gridY(this.mouseY, canvasHeight);
+        const y = this.camera.gridY(this.mouseY, this.canvas.height);
         if (!this.puzzle.containsY(y))
             return;
-        const canvasX = this.camera.canvasX(x, canvasWidth);
-        const canvasY = this.camera.canvasY(y, canvasHeight);
-        this.context.lineWidth = 1;
-        this.context.strokeStyle = '#fff4';
+        const canvasX = this.camera.canvasX(x, this.canvas.width);
+        const canvasY = this.camera.canvasY(y, this.canvas.height);
+        this.context.lineWidth = 2;
+        this.context.strokeStyle = '#fff6';
         this.context.strokeRect(canvasX, canvasY, this.camera.scale, this.camera.scale);
     }
-    renderControlSelection(canvasWidth, canvasHeight) {
-        const canvasX = this.camera.canvasX(this.controlGridX, canvasWidth);
-        const canvasY = this.camera.canvasY(this.controlGridY, canvasHeight);
-        this.context.lineWidth = 2;
+    renderControlSelection() {
+        const canvasX = this.camera.canvasX(this.controlGridX, this.canvas.width);
+        const canvasY = this.camera.canvasY(this.controlGridY, this.canvas.height);
+        this.context.lineWidth = 3;
         this.context.strokeStyle = 'white';
         this.context.strokeRect(canvasX, canvasY, this.camera.scale, this.camera.scale);
     }
-    renderBase(canvasWidth, canvasHeight) {
+    renderBases(gameContext) {
         for (let i = 0; i < this.puzzle.width(); i++) {
-            const x = this.camera.canvasX(i, canvasWidth);
+            const x = i * Images.CellSizePixels;
             for (let j = 0; j < this.puzzle.height(); j++) {
-                const y = this.camera.canvasY(j, canvasHeight);
+                const y = j * Images.CellSizePixels;
                 const base = this.puzzle.baseGrid[i][j];
-                this.context.drawImage(Images.Tilesets, Images.OffsetMap[base.connections], BaseTypes.TilesetOffset[base.type], Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
-                let offset = BaseRules.Offsets[base.rule];
-                switch (base.rule) {
-                    case BaseRules.Area:
-                    case BaseRules.Groups:
-                    case BaseRules.Neighbors:
-                    case BaseRules.Orthogonal:
-                    case BaseRules.Order:
-                    case BaseRules.Relative:
-                    case BaseRules.Rules:
-                    case BaseRules.States:
-                        offset += (base.count - 1) * Images.CellSizePixels;
-                        break;
-                    case BaseRules.Adjacent:
-                        offset += base.count * Images.CellSizePixels;
-                        break;
-                    case BaseRules.Symmetric:
-                        offset += (base.axis - 1) * Images.CellSizePixels;
-                        break;
-                    case BaseRules.Length:
-                        offset += (base.count - 1) * Images.CellSizePixels + (base.axis - 1) * 5 * Images.CellSizePixels;
-                        break;
-                }
-                this.context.drawImage(Images.Icons, offset, (base.color - 1) * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
-                if (base.fixed) {
-                    this.context.drawImage(Images.Tilesets, Images.OffsetMap[base.connections], Images.OffsetTemplateScrews, Images.CellSizePixels, Images.CellSizePixels, x, y, this.camera.scale, this.camera.scale);
-                }
+                this.renderBase(base, gameContext, x, y);
                 // this.context.fillText(base.connections.toString(2).padStart(8, '0'), x + 5, y + 20)
             }
         }
     }
-    renderBaseConnectionToggles(canvasWidth, canvasHeight) {
+    renderBase(base, gameContext, x, y) {
+        this.renderBaseType(base, gameContext, x, y);
+        this.renderBaseRule(base, gameContext, x, y);
+        this.renderBaseScrews(base, gameContext, x, y);
+    }
+    renderBaseType(base, gameContext, x, y) {
+        this.renderBaseBacking(base, gameContext, x, y);
+        const opacity = base.type === BaseTypes.Plain ? 1.0 : 0.5;
+        gameContext.globalAlpha = opacity;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[base.connections] * Images.CellSizePixels, BaseTypes.TilesetOffset[base.type] * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderBaseBacking(base, gameContext, x, y) {
+        if (base.type === BaseTypes.Plain)
+            return;
+        gameContext.globalAlpha = base.power / base.type;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[base.connections] * Images.CellSizePixels, Images.OffsetTemplateBaseBacking * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderBaseRule(base, gameContext, x, y) {
+        let offset = BaseRules.Offsets[base.rule];
+        switch (base.rule) {
+            case BaseRules.Area:
+            case BaseRules.Groups:
+            case BaseRules.Neighbors:
+            case BaseRules.Orthogonal:
+            case BaseRules.Order:
+            case BaseRules.Relative:
+            case BaseRules.Rules:
+            case BaseRules.States:
+                offset += (base.count - 1);
+                break;
+            case BaseRules.Adjacent:
+                offset += base.count;
+                break;
+            case BaseRules.Symmetric:
+                offset += (base.axis - 1);
+                break;
+            case BaseRules.Length:
+                offset += (base.count - 1) + (base.axis - 1) * 5;
+                break;
+        }
+        gameContext.globalAlpha = 0.75;
+        gameContext.drawImage(Images.Icons, offset * Images.CellSizePixels, (base.color - 1) * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderBaseScrews(base, gameContext, x, y) {
+        gameContext.globalAlpha = 1;
+        if (base.type !== BaseTypes.Plain && base.fixed) {
+            gameContext.drawImage(Images.Tilesets, Images.OffsetMap[base.connections] * Images.CellSizePixels, Images.OffsetTemplateScrews * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+        }
+    }
+    renderBaseConnectionToggles() {
         const potentialBaseConnections = this.puzzle.potentialBaseConnections();
-        this.context.beginPath();
         const radius = this.camera.scale * ConnectionToggleRadius;
+        this.context.beginPath();
         for (const connection of potentialBaseConnections) {
             const vector = Directions.Vectors[connection.direction];
-            const x = this.camera.canvasX(connection.gridX + 0.5 * (1 + vector.dx), canvasWidth);
-            const y = this.camera.canvasY(connection.gridY + 0.5 * (1 + vector.dy), canvasHeight);
+            const x = this.camera.canvasX(connection.gridX + 0.5 * (1 + vector.dx), this.canvas.width);
+            const y = this.camera.canvasY(connection.gridY + 0.5 * (1 + vector.dy), this.canvas.height);
             this.context.moveTo(x, y);
             this.context.arc(x, y, radius, 0, Tau);
         }
         this.context.fillStyle = '#ffffff20';
         this.context.fill();
     }
-    renderCards() {
+    renderFaces(gameContext) {
+        for (let i = 0; i < this.puzzle.width(); i++) {
+            const x = i * Images.CellSizePixels;
+            for (let j = 0; j < this.puzzle.height(); j++) {
+                const y = j * Images.CellSizePixels;
+                const stack = this.puzzle.faceGrid[i][j];
+                for (let k = 0; k < stack.length; k++) {
+                    const face = stack[k];
+                    this.renderFace(face, gameContext, x, y);
+                }
+            }
+        }
+    }
+    renderFace(face, gameContext, x, y) {
+        this.renderCardstock(face, gameContext, x, y);
+        this.renderWatermark(face, gameContext, x, y);
+        this.renderFaceRule(face, gameContext, x, y);
+        this.renderCreases(face, gameContext, x, y);
+        this.renderFaceBorder(face, gameContext, x, y);
+    }
+    renderCardShadows(gameContext) {
+        const offset = (Images.CardShadowSizePixels - Images.CellSizePixels) / 2;
+        for (let i = 0; i < this.puzzle.width(); i++) {
+            const x = i * Images.CellSizePixels - offset;
+            for (let j = 0; j < this.puzzle.height(); j++) {
+                const y = j * Images.CellSizePixels - offset;
+                const stack = this.puzzle.faceGrid[i][j];
+                for (let k = 0; k < stack.length; k++) {
+                    const face = stack[k];
+                    this.renderCardShadow(face, gameContext, x, y);
+                }
+            }
+        }
+    }
+    // Fix shadows to show atop other cards, perhaps by cutting and rendering after 
+    // Add recursive edits to card faces (back and front, watermark)
+    // Have directions for all icons
+    // Consider removing 'None' values for all but rules and watermark
+    renderCardShadow(face, gameContext, x, y) {
+        gameContext.globalAlpha = 0.125;
+        gameContext.drawImage(Images.CardShadowTileset, Images.OffsetMap[face.connectionBits] * Images.CardShadowSizePixels, 0, Images.CardShadowSizePixels, Images.CardShadowSizePixels, x, y, Images.CardShadowSizePixels, Images.CardShadowSizePixels);
+    }
+    renderCardstock(face, gameContext, x, y) {
+        gameContext.globalAlpha = 1.0;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[face.connectionBits] * Images.CellSizePixels, Images.OffsetTemplateCardstock * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderWatermark(face, gameContext, x, y) {
+        if (face.watermark === Watermarks.None)
+            return;
+        gameContext.globalAlpha = 0.5;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[face.connectionBits] * Images.CellSizePixels, Watermarks.TilesetOffset[face.watermark] * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderFaceRule(face, gameContext, x, y) {
+        let offset = FaceRules.Offsets[face.rule];
+        switch (face.rule) {
+            case FaceRules.Pointing:
+                offset += (face.direction - 1);
+                break;
+        }
+        gameContext.globalAlpha = 0.75;
+        gameContext.drawImage(Images.Icons, offset * Images.CellSizePixels, (face.color - 1) * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderCreases(face, gameContext, x, y) {
+        gameContext.globalAlpha = 1.0;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[face.creaseBits] * Images.CellSizePixels, Images.OffsetTemplateCrease * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
+    }
+    renderFaceBorder(face, gameContext, x, y) {
+        const offset = face.type === Faces.Front ? Images.OffsetTemplateFront : Images.OffsetTemplateBack;
+        gameContext.globalAlpha = 1.0;
+        gameContext.drawImage(Images.Tilesets, Images.OffsetMap[face.connectionBits] * Images.CellSizePixels, offset * Images.CellSizePixels, Images.CellSizePixels, Images.CellSizePixels, x, y, Images.CellSizePixels, Images.CellSizePixels);
     }
     renderTiles() {
     }

@@ -15,9 +15,9 @@ export default class BaseTypes {
 
     static readonly TilesetOffset = [
         Images.OffsetTemplateBasePlain,
-        Images.OffsetTemplateBaseBronze,
-        Images.OffsetTemplateBaseSilver,
         Images.OffsetTemplateBaseGold,
+        Images.OffsetTemplateBaseSilver,
+        Images.OffsetTemplateBaseBronze,
     ]
 
     static readonly Powered = [

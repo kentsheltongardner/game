@@ -1,16 +1,25 @@
+import Images from '../images.js';
 export default class Watermarks {
-    static Plain = 0;
+    static None = 0;
     static Grass = 1;
     static Wood = 2;
     static Stone = 3;
     static Water = 4;
     static Cloud = 5;
     static Names = [
-        'Plain',
+        'None',
         'Grass',
         'Wood',
         'Stone',
         'Water',
         'Cloud',
+    ];
+    static TilesetOffset = [
+        0,
+        Images.OffsetTemplateGrass,
+        Images.OffsetTemplateWood,
+        Images.OffsetTemplateStone,
+        Images.OffsetTemplateWater,
+        Images.OffsetTemplateCloud,
     ];
 }

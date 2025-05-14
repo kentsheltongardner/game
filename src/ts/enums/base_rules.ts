@@ -66,7 +66,7 @@ export default class BaseRules {
     ]
 
     static readonly Offsets = [
-        0, //'None', 
+        0,                              //'None', 
         Images.OffsetIconLeaf,          //'Vacuous', 
         Images.OffsetIconSun,           //'On', 
         Images.OffsetIconMoon,          //'Off', 

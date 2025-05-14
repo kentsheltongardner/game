@@ -10,6 +10,8 @@
 <body>
     <img id="icons" src="./res/images/icons.png">
     <img id="templates" src="./res/images/templates.png">
+    <img id="creases" src="./res/images/creases.png">
+    <img id="card-shadow-template" src="./res/images/card_shadow_template.png">
 
     <aside id="left">
         <section>
@@ -55,16 +57,16 @@
         <section>
             <div>
                 <div class="visibility-row">
-                    <div>Button</div>
-                    <input id="buttons-visible" type="checkbox" checked="checked">
+                    <div>Base</div>
+                    <input id="base-layer-visible" type="checkbox" checked="checked">
                 </div>
                 <div class="visibility-row">
                     <div>Card</div>
-                    <input id="cards-visible" type="checkbox" checked="checked">
+                    <input id="card-layer-visible" type="checkbox" checked="checked">
                 </div>
                 <div class="visibility-row">
                     <div>Tile</div>
-                    <input id="tiles-visible" type="checkbox" checked="checked">
+                    <input id="tile-layer-visible" type="checkbox" checked="checked">
                 </div>
             </div>
         </section>
@@ -108,94 +110,93 @@
         <section>
             <div class="input-grid">
                 <div>Type</div>
-                <select id="base-type-select"></select>
+                <select id="base-type-select" class="base-input"></select>
 
                 <div>Rule</div>
-                <select id="base-rule-select"></select>
+                <select id="base-rule-select" class="base-input"></select>
 
                 <div>Color</div>
-                <select id="base-color-select"></select>
+                <select id="base-color-select" class="base-input"></select>
 
                 <div>Count</div>
-                <select id="base-count-select"></select>
+                <select id="base-count-select" class="base-input"></select>
 
                 <div>Axis</div>
-                <select id="base-axis-select"></select>
+                <select id="base-axis-select" class="base-input"></select>
 
                 <div>Direction</div>
-                <select id="base-direction-select"></select>
+                <select id="base-direction-select" class="base-input"></select>
 
                 <div>Spin</div>
-                <select id="base-spin-select"></select>
+                <select id="base-spin-select" class="base-input"></select>
 
                 <div>Power</div>
-                <select id="base-power-select"></select>
+                <select id="base-power-select" class="base-input"></select>
 
                 <div>Shape</div>
                 <div id="base-shape-grid-container">
                     <div id="base-shape-grid">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
-                        <input type="checkbox">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
+                        <input type="checkbox" class="base-shape-checkbox base-input">
                     </div>
                 </div>
 
                 <div>Fixed</div>
-                <input id="base-fixed-checkbox" type="checkbox">
+                <input id="base-fixed-checkbox" class="base-input" type="checkbox">
 
                 <div>Visible</div>
-                <input id="base-visible-checkbox" type="checkbox">
+                <input id="base-visible-checkbox" class="base-input" type="checkbox">
             </div>
         </section>
 
         <section>
             <div class="input-grid">
                 <div>Top face</div>
-                <select id="top-card-face-select"></select>
+                <select id="top-face-type-select" class="face-input"></select>
 
                 <div>Top watermark</div>
-                <select id="top-card-watermark-select"></select>
+                <select id="top-face-watermark-select" class="face-input"></select>
 
                 <div>Top rule</div>
-                <select id="top-card-rule-select"></select>
+                <select id="top-face-rule-select" class="face-input"></select>
 
                 <div>Top color</div>
-                <select id="top-card-color-select"></select>
+                <select id="top-face-color-select" class="face-input"></select>
 
                 <div>Top direction</div>
-                <select id="top-card-direction-select"></select>
-            </div>
-        </section>
+                <select id="top-face-direction-select" class="face-input"></select>
 
-        <section>
-            <div class="input-grid">
                 <div>Bottom face</div>
-                <select id="bottom-card-face-select"></select>
+                <select id="bottom-face-type-select" class="face-input"></select>
 
                 <div>Bottom watermark</div>
-                <select id="bottom-card-watermark-select"></select>
+                <select id="bottom-face-watermark-select" class="face-input"></select>
 
                 <div>Bottom rule</div>
-                <select id="bottom-card-rule-select"></select>
+                <select id="bottom-face-rule-select" class="face-input"></select>
 
                 <div>Bottom color</div>
-                <select id="bottom-card-color-select"></select>
+                <select id="bottom-face-color-select" class="face-input"></select>
 
                 <div>Bottom direction</div>
-                <select id="bottom-card-direction-select"></select>
+                <select id="bottom-face-direction-select" class="face-input"></select>
+
+                <div>Connect</div>
+                <textarea id="face-connect-textarea"></textarea>
             </div>
         </section>
 
