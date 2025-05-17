@@ -1,14 +1,19 @@
+import Images from '../images.js';
 export default class Materials {
-    static Wood = 0;
-    static Iron = 1;
+    static Marble = 0;
+    static Wood = 1;
     static Glass = 2;
-    static Lodestone = 3;
-    static Starstone = 4; // Runestone, bloodstone
+    static Bloodstone = 3;
     static Names = [
+        'Marble',
         'Wood',
-        'Iron',
         'Glass',
-        'Lodestone',
-        'Starstone',
+        'Bloodstone',
+    ];
+    static TilesetOffset = [
+        Images.OffsetTemplateMaterialMarble,
+        Images.OffsetTemplateMaterialWood,
+        Images.OffsetTemplateMaterialGlass,
+        Images.OffsetTemplateMaterialBloodstone,
     ];
 }

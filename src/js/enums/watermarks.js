@@ -16,10 +16,10 @@ export default class Watermarks {
     ];
     static TilesetOffset = [
         0,
-        Images.OffsetTemplateGrass,
-        Images.OffsetTemplateWood,
-        Images.OffsetTemplateStone,
-        Images.OffsetTemplateWater,
-        Images.OffsetTemplateCloud,
+        Images.OffsetTemplateWatermarkGrass,
+        Images.OffsetTemplateWatermarkWood,
+        Images.OffsetTemplateWatermarkStone,
+        Images.OffsetTemplateWatermarkWater,
+        Images.OffsetTemplateWatermarkCloud,
     ];
 }

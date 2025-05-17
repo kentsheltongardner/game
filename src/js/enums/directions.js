@@ -51,7 +51,7 @@ export default class Directions {
         Directions.Southeast,
         Directions.Southwest
     ];
-    static Clockwise = [
+    static QuarterClockwise = [
         Directions.None,
         Directions.South,
         Directions.West,
@@ -62,7 +62,7 @@ export default class Directions {
         Directions.Northeast,
         Directions.Southeast
     ];
-    static CounterClockwise = [
+    static QuarterCounterClockwise = [
         Directions.None,
         Directions.North,
         Directions.East,
@@ -72,6 +72,28 @@ export default class Directions {
         Directions.Southeast,
         Directions.Southwest,
         Directions.Northwest
+    ];
+    static EighthClockwise = [
+        Directions.None,
+        Directions.Southeast,
+        Directions.Southwest,
+        Directions.Northwest,
+        Directions.Northeast,
+        Directions.South,
+        Directions.West,
+        Directions.North,
+        Directions.East
+    ];
+    static EighthCounterClockwise = [
+        Directions.None,
+        Directions.Northeast,
+        Directions.Southeast,
+        Directions.Southwest,
+        Directions.Northwest,
+        Directions.East,
+        Directions.South,
+        Directions.West,
+        Directions.North
     ];
     static HorizontalReflection = [
         Directions.None,

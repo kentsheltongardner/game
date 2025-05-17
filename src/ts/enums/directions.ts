@@ -58,7 +58,7 @@ export default class Directions {
         Directions.Southwest
     ]
 
-    static readonly Clockwise = [
+    static readonly QuarterClockwise = [
         Directions.None,
         Directions.South,
         Directions.West,
@@ -70,7 +70,7 @@ export default class Directions {
         Directions.Southeast
     ]
 
-    static readonly CounterClockwise = [
+    static readonly QuarterCounterClockwise = [
         Directions.None,
         Directions.North,
         Directions.East,
@@ -80,6 +80,30 @@ export default class Directions {
         Directions.Southeast,
         Directions.Southwest,
         Directions.Northwest
+    ]
+
+    static readonly EighthClockwise = [
+        Directions.None,
+        Directions.Southeast,
+        Directions.Southwest,
+        Directions.Northwest,
+        Directions.Northeast,
+        Directions.South,
+        Directions.West,
+        Directions.North,
+        Directions.East
+    ]
+
+    static readonly EighthCounterClockwise = [
+        Directions.None,
+        Directions.Northeast,
+        Directions.Southeast,
+        Directions.Southwest,
+        Directions.Northwest,
+        Directions.East,
+        Directions.South,
+        Directions.West,
+        Directions.North
     ]
 
     static readonly HorizontalReflection = [
@@ -132,6 +156,4 @@ export default class Directions {
     static getDirection(dx: number, dy: number) {
         return Directions.VectorDirections[dy + 1][dx + 1]
     }
-
-    
 }

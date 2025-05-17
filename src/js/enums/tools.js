@@ -14,6 +14,10 @@ export default class Tools {
     static Reverse = 12;
     static RecursiveReverse = 13;
     static Flatten = 14;
+    static Slide = 15;
+    static Fasten = 16;
+    static Click = 17;
+    static Move = 18;
     static Names = [
         'Create',
         'Create snake',
@@ -30,12 +34,16 @@ export default class Tools {
         'Reverse',
         'Recursive reverse',
         'Flatten',
+        'Slide',
+        'Fasten',
+        'Click',
+        'Move',
     ];
     static BaseTools = [
         Tools.Create,
         Tools.Edit,
         Tools.Connect,
-        Tools.Disconnect,
+        Tools.Click,
     ];
     static CardTools = [
         Tools.Create,
@@ -43,13 +51,15 @@ export default class Tools {
         Tools.Connect,
         Tools.Crease,
         Tools.FlipFold,
+        Tools.Move,
         Tools.RecursiveDelete,
     ];
     static TileTools = [
         Tools.Create,
         Tools.Edit,
         Tools.Connect,
-        Tools.Disconnect,
+        Tools.Fasten,
+        Tools.Slide,
         Tools.Delete,
         Tools.RecursiveDelete,
     ];

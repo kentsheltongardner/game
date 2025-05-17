@@ -13,11 +13,11 @@ export default class Base {
     direction;
     shape;
     spin;
-    connections;
+    connectionBits;
     power;
     fixed;
     visible;
-    constructor(type = BaseTypes.Plain, rule = BaseRules.None, color = Colors.None, count = 0, axis = Axes.None, direction = Directions.None, shape = 0, spin = Spins.None, connections = 0, power = 0, fixed = false, visible = true) {
+    constructor(type = BaseTypes.Plain, rule = BaseRules.None, color = Colors.None, count = 0, axis = Axes.None, direction = Directions.None, shape = 0, spin = Spins.None, power = 0, fixed = false, visible = true, connectionBits = 0) {
         this.type = type;
         this.rule = rule;
         this.color = color;
@@ -26,9 +26,9 @@ export default class Base {
         this.direction = direction;
         this.shape = shape;
         this.spin = spin;
-        this.connections = connections;
         this.power = power;
         this.fixed = fixed;
         this.visible = visible;
+        this.connectionBits = connectionBits;
     }
 }

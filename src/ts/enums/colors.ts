@@ -1,6 +1,5 @@
 export default class Colors {
     static readonly None        = 0
-
     static readonly Black       = 1
     static readonly Red         = 2
     static readonly Orange      = 3

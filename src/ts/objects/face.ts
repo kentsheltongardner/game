@@ -17,6 +17,7 @@ export default class Face {
     creaseBits:     number
     connections:    Array<Face | null>
 
+    invert:         boolean = false
     flag:           boolean = false
 
     constructor(
@@ -58,6 +59,8 @@ export default class Face {
     }
 
     flipY() {
+        this.invert                             = !this.invert
+
         const creaseSouth                       = (this.creaseBits & Directions.BitsSouth) === Directions.BitsSouth
         const creaseNorth                       = (this.creaseBits & Directions.BitsNorth) === Directions.BitsNorth
         this.creaseBits                         &= ~(Directions.BitsSouth | Directions.BitsNorth)

@@ -20,10 +20,6 @@ export default class BaseTypes {
         Images.OffsetTemplateBaseBronze,
     ]
 
-    static readonly Powered = [
-        false,
-        true,
-        true,
-        true,
-    ]
+    static readonly Powered     = [ false, true, true, true ]
+    static readonly StateCount  = [ 1, 2, 3, 4 ]
 }

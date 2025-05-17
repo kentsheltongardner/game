@@ -1,4 +1,5 @@
 export default class Tools {
+
     static readonly Create              = 0
     static readonly CreateSnake         = 1
     static readonly CreateRectangle     = 2
@@ -14,6 +15,10 @@ export default class Tools {
     static readonly Reverse             = 12
     static readonly RecursiveReverse    = 13
     static readonly Flatten             = 14
+    static readonly Slide               = 15
+    static readonly Fasten              = 16
+    static readonly Click               = 17
+    static readonly Move                = 18
 
     static readonly Names = [
         'Create', 
@@ -30,14 +35,18 @@ export default class Tools {
         'Recursive delete', 
         'Reverse', 
         'Recursive reverse', 
-        'Flatten' ,
+        'Flatten',
+        'Slide',
+        'Fasten',
+        'Click',
+        'Move',
     ]
 
     static readonly BaseTools = [
         Tools.Create,
         Tools.Edit,
         Tools.Connect,
-        Tools.Disconnect,
+        Tools.Click,
     ]
 
     static readonly CardTools = [
@@ -46,6 +55,7 @@ export default class Tools {
         Tools.Connect, 
         Tools.Crease, 
         Tools.FlipFold, 
+        Tools.Move,
         Tools.RecursiveDelete, 
     ]
 
@@ -53,7 +63,8 @@ export default class Tools {
         Tools.Create,
         Tools.Edit,
         Tools.Connect,
-        Tools.Disconnect,
+        Tools.Fasten,
+        Tools.Slide,
         Tools.Delete,
         Tools.RecursiveDelete,
     ]

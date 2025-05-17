@@ -1,4 +1,4 @@
-export default class Connection {
+export default class ConnectionToggle {
     public gridX:       number
     public gridY:       number
     public direction:   number

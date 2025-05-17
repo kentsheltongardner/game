@@ -14,7 +14,7 @@ export default class Base {
     direction:      number
     shape:          number
     spin:           number
-    connections:    number
+    connectionBits: number
     power:          number
     fixed:          boolean 
     visible:        boolean
@@ -28,10 +28,10 @@ export default class Base {
         direction:      number  = Directions.None,
         shape:          number  = 0,
         spin:           number  = Spins.None,
-        connections:    number  = 0,
         power:          number  = 0,
         fixed:          boolean = false,
         visible:        boolean = true,
+        connectionBits: number  = 0,
     ) {
         this.type           = type
         this.rule           = rule
@@ -41,9 +41,9 @@ export default class Base {
         this.direction      = direction
         this.shape          = shape
         this.spin           = spin
-        this.connections    = connections
         this.power          = power
         this.fixed          = fixed
         this.visible        = visible
+        this.connectionBits = connectionBits
     }
 }

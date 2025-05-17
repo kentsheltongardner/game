@@ -16,10 +16,6 @@ export default class BaseTypes {
         Images.OffsetTemplateBaseSilver,
         Images.OffsetTemplateBaseBronze,
     ];
-    static Powered = [
-        false,
-        true,
-        true,
-        true,
-    ];
+    static Powered = [false, true, true, true];
+    static StateCount = [1, 2, 3, 4];
 }

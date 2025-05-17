@@ -15,6 +15,7 @@ export default class Face {
     connectionBits;
     creaseBits;
     connections;
+    invert = false;
     flag = false;
     constructor(type = FaceTypes.Front, watermark = Watermarks.None, rule = FaceRules.None, color = Colors.None, direction = Directions.None, connectionBits = Directions.BitsNone, creaseBits = Directions.BitsNone, connections = new Array(4).fill(null)) {
         this.type = type;
@@ -43,6 +44,7 @@ export default class Face {
         this.connections[Directions.West - 1] = connectionEast;
     }
     flipY() {
+        this.invert = !this.invert;
         const creaseSouth = (this.creaseBits & Directions.BitsSouth) === Directions.BitsSouth;
         const creaseNorth = (this.creaseBits & Directions.BitsNorth) === Directions.BitsNorth;
         this.creaseBits &= ~(Directions.BitsSouth | Directions.BitsNorth);
